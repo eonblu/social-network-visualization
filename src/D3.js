@@ -4,8 +4,8 @@ import * as d3 from 'd3';
 
 const GraphVisualization = () => {
   const svgRef = useRef();
-  const width = 928;
-  const height = 680;
+  const width = window.innerWidth * 0.8;
+  const height = window.innerHeight * 0.8;
 
   const generateRandomLinks = (nodeCount, linkCount) => {
     const links = [];
@@ -57,7 +57,7 @@ const GraphVisualization = () => {
       const links = generateRandomLinks(150, 200);
 
   useEffect(() => {
-    const svg = d3.select(svgRef.current).attr('width', width).attr('height', height);
+    const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
     if (drawArea.empty()) {
