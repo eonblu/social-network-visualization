@@ -58,10 +58,7 @@ const GraphVisualization = () => {
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height);
-    let drawArea = svg.select('.drawArea');
-
-    if (drawArea.empty()) {
-      drawArea = svg.append('g').attr('class', 'drawArea');
+    const drawArea = svg.append('g').attr('class', 'drawArea');
 
     // Create a zoom behavior
     const zoom = d3.zoom().on('zoom', (event) => {
@@ -148,8 +145,7 @@ const GraphVisualization = () => {
         .attr('transform', d => `translate(${d.x},${d.y})`);
     });
 
-  }
-}, [width, height, nodes, links, findNeighboringNodes]);
+  }, [width, height, nodes, links, findNeighboringNodes]);
 
   return <svg ref={svgRef}></svg>;
 };
