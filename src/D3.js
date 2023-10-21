@@ -7,7 +7,7 @@ const GraphVisualization = () => {
   const width = window.innerWidth * 0.8;
   const height = window.innerHeight * 0.8;
 
-  const generateRandomLinks = (nodeCount, linkCount) => {
+  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
     const links = [];
     for (let i = 0; i < linkCount; i++) {
       const source = Math.floor(Math.random() * nodeCount) + 1;
@@ -16,6 +16,8 @@ const GraphVisualization = () => {
         target = Math.floor(Math.random() * nodeCount) + 1;
       }
       links.push({ source, target });
+      nodes.find((node) => node.id === source).connections += 1;
+      nodes.find((node) => node.id === target).connections += 1;
     }
     return links;
   };
@@ -52,21 +54,38 @@ const GraphVisualization = () => {
     });
   }, []);
 
+  
       // Your graph data
-      const nodes = d3.range(1, 151).map((i) => ({ id: i }));
-      const links = generateRandomLinks(150, 200);
+      const nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
+      const links = generateRandomLinks(150, 200, nodes);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
+    const resetGraph = () => {
+      // Reset SVG content
+      d3.select(svgRef.current).selectAll("*").remove();
+      drawArea = svg.select('.drawArea');
+      // Reset the zoom transform to the identity transform
+      svg.call(zoom.transform, d3.zoomIdentity);
+      createGraph();
+      };
+
+      // Add a button for resetting the graph
+      const resetButton = document.createElement('button');
+      resetButton.innerText = 'Reset Graph';
+      resetButton.addEventListener('click', resetGraph);
+      document.body.appendChild(resetButton);
+
+      // Create a zoom behavior
+      const zoom = d3.zoom().on('zoom', (event) => {
+        svg.select('.drawArea').attr('transform', event.transform);
+      });
+
+    const createGraph = () => {      
     if (drawArea.empty()) {
       drawArea = svg.append('g').attr('class', 'drawArea');
-
-    // Create a zoom behavior
-    const zoom = d3.zoom().on('zoom', (event) => {
-      svg.select('.drawArea').attr('transform', event.transform);
-    });
 
     // Add zoom behavior to SVG
     svg.call(zoom);
@@ -79,12 +98,12 @@ const GraphVisualization = () => {
         d3
           .forceLink(links)
           .id((d) => d.id)
-          //.distance(25) // Adjust the distance value as needed
+          .distance(25) // Adjust the distance value as needed
       )
-      .force('charge', d3.forceManyBody().strength(-200))
+      .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('x', d3.forceX(width / 2).strength(0.1)) // Adjust the strength as needed
-      .force('collision', d3.forceCollide().radius(10))
+      .force('collision', d3.forceCollide().radius(15))
       .force('y', d3.forceY(height / 2).strength(0.1));
 
       simulation.alphaDecay(0.01);
@@ -112,7 +131,7 @@ const GraphVisualization = () => {
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5)
       .append('circle')
-      .attr('r', 9)
+      .attr('r', d => (9 + d.connections))
       .attr('fill', 'red')
       .on('click', (event, d) => {
         const clickedNodeId = d.id;
@@ -131,7 +150,7 @@ const GraphVisualization = () => {
       .attr('dy', 4)
       .attr('text-anchor', 'middle')
       .style('pointer-events', 'none')
-      .style('font-size', '10px') // Adjust the font size as needed
+      .style('font-size', '8px') // Adjust the font size as needed
       .style('font-family', 'Courier New, monospace') // Adjust the font family as needed
       .text(d => d.id);
 
@@ -146,12 +165,16 @@ const GraphVisualization = () => {
 
         node
         .attr('transform', d => `translate(${d.x},${d.y})`);
+      
     });
-
   }
+};
+
+createGraph();
+
 }, [width, height, nodes, links, findNeighboringNodes]);
 
-  return <svg ref={svgRef}></svg>;
+return <svg ref={svgRef}></svg>;
 };
 
 export default GraphVisualization;
