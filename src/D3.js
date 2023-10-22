@@ -177,4 +177,4 @@ createGraph();
 return <svg ref={svgRef}></svg>;
 };
 
-export default GraphVisualization;
+export default GraphVisualization, resetGraph;
