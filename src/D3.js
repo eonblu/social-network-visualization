@@ -2,10 +2,13 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
 
 
-const GraphVisualization = () => {
+const NetworkVisualization = () => {
   const svgRef = useRef();
+  const wrapperRef = useRef();
   const width = window.innerWidth * 0.8;
+  const buttonWidth = window.innerWidth * 0.1;
   const height = window.innerHeight * 0.8;
+  const buttonHeight = window.innerHeight * 0.05;
 
   const generateRandomLinks = (nodeCount, linkCount, nodes) => {
     const links = [];
@@ -54,10 +57,9 @@ const GraphVisualization = () => {
     });
   }, []);
 
-  
-      // Your graph data
-      const nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
-      const links = generateRandomLinks(150, 200, nodes);
+// Your graph data
+const nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
+const links = generateRandomLinks(150, 200, nodes);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
@@ -72,11 +74,16 @@ const GraphVisualization = () => {
       createGraph();
       };
 
+      if (drawArea.empty()) {
       // Add a button for resetting the graph
       const resetButton = document.createElement('button');
       resetButton.innerText = 'Reset Graph';
       resetButton.addEventListener('click', resetGraph);
-      document.body.appendChild(resetButton);
+      resetButton.style.width = `${buttonWidth*0.75}px`;
+      resetButton.style.height = `${buttonHeight}px`;
+      resetButton.style.margin = `0px ${buttonWidth*0.125}px 0px ${buttonWidth*0.125}px`;
+      wrapperRef.current.prepend(resetButton);
+      };
 
       // Create a zoom behavior
       const zoom = d3.zoom().on('zoom', (event) => {
@@ -115,7 +122,7 @@ const GraphVisualization = () => {
       .enter()
       .append('line')
       .attr('stroke', '#999')
-      .attr('stroke-width', d => Math.sqrt(d.value))
+      .attr('stroke-width', 1.5)
       .attr('stroke-opactiy', 0.6);
 
     // Draw nodes
@@ -129,9 +136,9 @@ const GraphVisualization = () => {
 
       node
       .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
+      .attr('stroke-width', 3)
       .append('circle')
-      .attr('r', d => (9 + d.connections))
+      .attr('r', d => (7 + 1.25*d.connections))
       .attr('fill', 'red')
       .on('click', (event, d) => {
         const clickedNodeId = d.id;
@@ -145,15 +152,14 @@ const GraphVisualization = () => {
         findNeighboringNodes(clickedNodeId, newColor, svg, links);
       });
 
-      node
-      .append('text')
-      .attr('dy', 4)
-      .attr('text-anchor', 'middle')
-      .style('pointer-events', 'none')
-      .style('font-size', '8px') // Adjust the font size as needed
-      .style('font-family', 'Courier New, monospace') // Adjust the font family as needed
-      .text(d => d.id);
-
+//      node
+//     .append('text')
+//     .attr('dy', 4)
+//     .attr('text-anchor', 'middle')
+//     .style('pointer-events', 'none')
+//     .style('font-size', '8px') // Adjust the font size as needed
+//     .style('font-family', 'Courier New, monospace') // Adjust the font family as needed
+//     .text(d => d.id);
 
     // Update simulation each tick
     simulation.on('tick', () => {
@@ -172,9 +178,14 @@ const GraphVisualization = () => {
 
 createGraph();
 
-}, [width, height, nodes, links, findNeighboringNodes]);
+}, [width, height, nodes, links, buttonWidth, buttonHeight, findNeighboringNodes]);
 
-return <svg ref={svgRef}></svg>;
+return (
+  <div style={{ display: 'flex' }} ref={wrapperRef}>
+    <svg ref={svgRef}></svg>
+  </div>
+);
 };
 
-export default GraphVisualization, resetGraph;
+
+export default NetworkVisualization;
