@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
-
+import data from './data.json';
 
 const NetworkVisualization = () => {
   const svgRef = useRef();
@@ -9,21 +9,6 @@ const NetworkVisualization = () => {
   const buttonWidth = window.innerWidth * 0.1;
   const height = window.innerHeight * 0.8;
   const buttonHeight = window.innerHeight * 0.05;
-
-  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
-    const links = [];
-    for (let i = 0; i < linkCount; i++) {
-      const source = Math.floor(Math.random() * nodeCount) + 1;
-      let target = Math.floor(Math.random() * nodeCount) + 1;
-      while (target === source) {
-        target = Math.floor(Math.random() * nodeCount) + 1;
-      }
-      links.push({ source, target });
-      nodes.find((node) => node.id === source).connections += 1;
-      nodes.find((node) => node.id === target).connections += 1;
-    }
-    return links;
-  };
 
   const findNeighboringNodes = useCallback((clickedNodeId, newColor, svg, links) => {
     const connectedLinks = links.filter(
@@ -57,15 +42,32 @@ const NetworkVisualization = () => {
     });
   }, []);
 
-// Your graph data
-const nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
-const links = generateRandomLinks(150, 200, nodes);
+useEffect(() => {
+  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
+    const links = [];
+    for (let i = 0; i < linkCount; i++) {
+      const source = Math.floor(Math.random() * nodeCount) + 1;
+      let target = Math.floor(Math.random() * nodeCount) + 1;
+      while (target === source) {
+        target = Math.floor(Math.random() * nodeCount) + 1;
+      }
+      links.push({ source, target });
+      nodes.find((node) => node.id === source).connections += 1;
+      nodes.find((node) => node.id === target).connections += 1;
+    }
+    return links;
+  };
+    // Your graph data
+    var nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
+    var links = generateRandomLinks(150, 200, nodes);
 
-  useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
-    const resetGraph = () => {
+    const resetGraph = (buttonID) => {
+      if (buttonID === 1) {nodes = data.nodes1; links = data.links1}
+      else if (buttonID === 2) {nodes = data.nodes2; links = data.links2}
+      else if (buttonID === 3) {nodes = data.nodes3; links = data.links3};
       // Reset SVG content
       d3.select(svgRef.current).selectAll("*").remove();
       drawArea = svg.select('.drawArea');
@@ -75,20 +77,41 @@ const links = generateRandomLinks(150, 200, nodes);
       };
 
       if (drawArea.empty()) {
-      // Add a button for resetting the graph
-      const resetButton = document.createElement('button');
-      resetButton.innerText = 'Reset Graph';
-      resetButton.addEventListener('click', resetGraph);
-      resetButton.style.width = `${buttonWidth*0.75}px`;
-      resetButton.style.height = `${buttonHeight}px`;
-      resetButton.style.margin = `0px ${buttonWidth*0.125}px 0px ${buttonWidth*0.125}px`;
-      wrapperRef.current.prepend(resetButton);
-      };
+        const buttonWrapper = document.createElement('div');
+        buttonWrapper.style.display = 'flex';
+        buttonWrapper.style.flexDirection = 'column';
+        wrapperRef.current.prepend(buttonWrapper);
+      
+        // Add a button for resetting the graph
+        const resetButton = document.createElement('button');
+        resetButton.innerText = 'Sample Set 1';
+        resetButton.addEventListener('click', () => resetGraph(1));
+        resetButton.style.width = `${buttonWidth*0.75}px`;
+        resetButton.style.height = `${buttonHeight}px`;
+        resetButton.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        buttonWrapper.appendChild(resetButton);
+      
+        const resetButton2 = document.createElement('button');
+        resetButton2.innerText = 'Sample Set 2';
+        resetButton2.addEventListener('click', () => resetGraph(2));
+        resetButton2.style.width = `${buttonWidth*0.75}px`;
+        resetButton2.style.height = `${buttonHeight}px`;
+        resetButton2.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        buttonWrapper.appendChild(resetButton2);
+      
+        const resetButton3 = document.createElement('button');
+        resetButton3.innerText = 'Sample Set 3';
+        resetButton3.addEventListener('click', () => resetGraph(3));
+        resetButton3.style.width = `${buttonWidth*0.75}px`;
+        resetButton3.style.height = `${buttonHeight}px`;
+        resetButton3.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        buttonWrapper.appendChild(resetButton3);
+        };
 
-      // Create a zoom behavior
-      const zoom = d3.zoom().on('zoom', (event) => {
-        svg.select('.drawArea').attr('transform', event.transform);
-      });
+    // Create a zoom behavior
+    const zoom = d3.zoom().on('zoom', (event) => {
+      svg.select('.drawArea').attr('transform', event.transform);
+    });
 
     const createGraph = () => {      
     if (drawArea.empty()) {
@@ -178,7 +201,7 @@ const links = generateRandomLinks(150, 200, nodes);
 
 createGraph();
 
-}, [width, height, nodes, links, buttonWidth, buttonHeight, findNeighboringNodes]);
+}, [width, height, buttonWidth, buttonHeight, findNeighboringNodes]);
 
 return (
   <div style={{ display: 'flex' }} ref={wrapperRef}>
