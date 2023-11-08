@@ -1,0 +1,42 @@
+.button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 8vw;
+    margin: 1vw;
+  }
+
+.button {
+    width: 8vw; /* Adjust the width as needed */
+    height: 5vh; /* Adjust the height as needed */
+    margin: 1vw; /* Adjust the margin as needed */
+    border: none;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .button:hover {
+    background-color: #2980b9;
+  }
+  
+  .slider {
+    width: 80%;
+    height: 10px;
+    margin: 2vh 0;
+    background: #3498db;
+    transition: background-color 0.3s, border 0.3s;
+    background-color: #2980b9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+  }
+
+  .slider::-webkit-slider-thumb {
+    width: 20px; /* Set the width of the thumb */
+    height: 20px; /* Set the height of the thumb */
+  }
+  .slider:focus {
+    /* Add an outline on focus for accessibility */
+    outline: none;
+  }

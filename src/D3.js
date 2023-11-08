@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import * as d3 from 'd3';
 import data from './data.json';
+import './D3styles.css';
 
 const NetworkVisualization = () => {
   const svgRef = useRef();
   const wrapperRef = useRef();
   const width = window.innerWidth * 0.8;
-  const buttonWidth = window.innerWidth * 0.1;
   const height = window.innerHeight * 0.8;
-  const buttonHeight = window.innerHeight * 0.05;
+  var [randomChance, setRandomChance] = useState(0.7);
 
   const findNeighboringNodes = useCallback((clickedNodeId, newColor, svg, links) => {
     const connectedLinks = links.filter(
@@ -21,7 +21,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.target.id)
           .select('circle');
-        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && Math.random() < 0.7) {
+        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && Math.random() < randomChance) {
           setTimeout(() => {
             targetNode.attr('fill', newColor);
             findNeighboringNodes(link.target.id, newColor, svg, links);
@@ -32,7 +32,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.source.id)
           .select('circle');
-        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && Math.random() < 0.7) {
+        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && Math.random() < randomChance) {
           setTimeout(() => {
             sourceNode.attr('fill', newColor);
             findNeighboringNodes(link.source.id, newColor, svg, links);
@@ -40,7 +40,7 @@ const NetworkVisualization = () => {
         }
       }
     });
-  }, []);
+  }, [randomChance]);
 
 useEffect(() => {
   const generateRandomLinks = (nodeCount, linkCount, nodes) => {
@@ -57,6 +57,7 @@ useEffect(() => {
     }
     return links;
   };
+
     // Your graph data
     var nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
     var links = generateRandomLinks(150, 200, nodes);
@@ -78,34 +79,43 @@ useEffect(() => {
 
       if (drawArea.empty()) {
         const buttonWrapper = document.createElement('div');
-        buttonWrapper.style.display = 'flex';
-        buttonWrapper.style.flexDirection = 'column';
+        buttonWrapper.classList.add('button-wrapper');
         wrapperRef.current.prepend(buttonWrapper);
       
         // Add a button for resetting the graph
         const resetButton = document.createElement('button');
         resetButton.innerText = 'Sample Set 1';
         resetButton.addEventListener('click', () => resetGraph(1));
-        resetButton.style.width = `${buttonWidth*0.75}px`;
-        resetButton.style.height = `${buttonHeight}px`;
-        resetButton.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        resetButton.classList.add('button');
         buttonWrapper.appendChild(resetButton);
       
         const resetButton2 = document.createElement('button');
         resetButton2.innerText = 'Sample Set 2';
         resetButton2.addEventListener('click', () => resetGraph(2));
-        resetButton2.style.width = `${buttonWidth*0.75}px`;
-        resetButton2.style.height = `${buttonHeight}px`;
-        resetButton2.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        resetButton2.classList.add('button');
         buttonWrapper.appendChild(resetButton2);
       
         const resetButton3 = document.createElement('button');
         resetButton3.innerText = 'Sample Set 3';
         resetButton3.addEventListener('click', () => resetGraph(3));
-        resetButton3.style.width = `${buttonWidth*0.75}px`;
-        resetButton3.style.height = `${buttonHeight}px`;
-        resetButton3.style.margin = `0px ${buttonWidth*0.125}px ${buttonWidth*0.125}px ${buttonWidth*0.125}px`;
+        resetButton3.classList.add('button');
         buttonWrapper.appendChild(resetButton3);
+
+        const handleRandomChanceChange = (event) => {
+          const newRandomChance = parseFloat(event.target.value);
+          setRandomChance(newRandomChance);
+          randomChance = newRandomChance;
+        };
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = 0;
+        slider.max = 1;
+        slider.step = 0.01;
+        slider.value = randomChance;
+        slider.classList.add('slider');
+        slider.addEventListener('input', handleRandomChanceChange);
+        buttonWrapper.appendChild(slider);
         };
 
     // Create a zoom behavior
@@ -201,7 +211,7 @@ useEffect(() => {
 
 createGraph();
 
-}, [width, height, buttonWidth, buttonHeight, findNeighboringNodes]);
+}, [width, height, findNeighboringNodes, randomChance]);
 
 return (
   <div style={{ display: 'flex' }} ref={wrapperRef}>
