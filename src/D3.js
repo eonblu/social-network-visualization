@@ -70,18 +70,24 @@ useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
-    const resetGraph = (buttonID) => {
+    const resetGraph = (buttonID, resetZoom = true) => {
       // eslint-disable-next-line
       generationvalue = 0; generationtext.text('Generation: ' +  generationvalue);
       if (buttonID === 1) {nodes = data.nodes1; links = data.links1}
       else if (buttonID === 2) {nodes = data.nodes2; links = data.links2}
       else if (buttonID === 3) {nodes = data.nodes3; links = data.links3};
+      const currentZoomTransform = d3.zoomTransform(svg.node());
       // Reset SVG content
       d3.select(svgRef.current).selectAll("*").remove();
       drawArea = svg.select('.drawArea');
       // Reset the zoom transform to the identity transform
-      svg.call(zoom.transform, d3.zoomIdentity);
       createGraph();
+      if (!resetZoom) {
+        drawArea.attr('transform', currentZoomTransform);
+        } 
+      else {
+        svg.call(zoom.transform, d3.zoomIdentity);
+      };
       };
 
       if (drawArea.empty()) {
@@ -92,19 +98,19 @@ useEffect(() => {
         // Add a button for resetting the graph
         const resetButton = document.createElement('button');
         resetButton.innerText = 'Sample Set 1';
-        resetButton.addEventListener('click', () => resetGraph(1));
+        resetButton.addEventListener('click', () => resetGraph(1, true));
         resetButton.classList.add('button');
         buttonWrapper.appendChild(resetButton);
       
         const resetButton2 = document.createElement('button');
         resetButton2.innerText = 'Sample Set 2';
-        resetButton2.addEventListener('click', () => resetGraph(2));
+        resetButton2.addEventListener('click', () => resetGraph(2, true));
         resetButton2.classList.add('button');
         buttonWrapper.appendChild(resetButton2);
       
         const resetButton3 = document.createElement('button');
         resetButton3.innerText = 'Sample Set 3';
-        resetButton3.addEventListener('click', () => resetGraph(3));
+        resetButton3.addEventListener('click', () => resetGraph(3, true));
         resetButton3.classList.add('button');
         buttonWrapper.appendChild(resetButton3);
 
@@ -202,7 +208,22 @@ useEffect(() => {
       .append('line')
       .attr('stroke', '#999')
       .attr('stroke-width', 1.5)
-      .attr('stroke-opactiy', 0.6);
+      .attr('stroke-opactiy', 0.6)
+      .on('click', (event, d) => {
+        // Assuming d.source and d.target are node IDs
+        const sourceNode = d.source;
+        const targetNode = d.target;
+
+        // Decrement the connections attribute for the source and target nodes
+        if (sourceNode) sourceNode.connections -= 1;
+        if (targetNode) targetNode.connections -= 1;
+    
+        // Remove the clicked link from the links array
+        links = links.filter(link => link !== d);
+    
+        // Redraw the graph with the updated links
+        resetGraph(0, false);
+      });
 
     // Draw nodes
     const node = drawArea
