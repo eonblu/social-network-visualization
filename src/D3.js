@@ -13,6 +13,53 @@ const NetworkVisualization = () => {
   var generationvalue = 0;
   let generationtext;
 
+  function generateBarabasiAlbertGraph(nodeCount, k) {
+    const nodes = Array.from({ length: nodeCount }, (_, index) => ({ id: index + 1, connections: 0 }));
+    const links = [];
+  
+    for (let i = k + 1; i <= nodeCount; i++) {
+      const probabilities = calculateProbabilities(nodes, links);
+      const selectedTargets = selectTargets(probabilities, k);
+  
+      for (const target of selectedTargets) {
+        links.push({ source: i, target });
+        nodes[i - 1].connections++;
+        nodes[target - 1].connections++;
+      }
+    }
+  
+    return { nodes, links };
+  }
+  
+  function calculateProbabilities(nodes, links) {
+    const probabilities = nodes.map(node => node.connections);
+    const totalConnections = links.length * 2;
+  
+    return probabilities.map(connections => connections / totalConnections);
+  }
+  
+  function selectTargets(probabilities, k) {
+    const targets = [];
+    for (let i = 0; i < k; i++) {
+      targets.push(selectIndexWithProbability(probabilities));
+    }
+    return targets;
+  }
+  
+  function selectIndexWithProbability(probabilities) {
+    const randomValue = Math.random();
+    let cumulativeProbability = 0;
+  
+    for (let i = 0; i < probabilities.length; i++) {
+      cumulativeProbability += probabilities[i];
+      if (randomValue <= cumulativeProbability) {
+        return i + 1; // Convert from 0-based index to 1-based index
+      }
+    }
+  
+    return probabilities.length; // Default to the last index if not selected earlier
+  }
+
   const findNeighboringNodes = useCallback((clickedNodeId, newColor, svg, links, generation) => {
     // eslint-disable-next-line
     if (generationvalue < generation) {generationvalue = generation; generationtext.text('Generation: ' +  generation)};
@@ -48,24 +95,25 @@ const NetworkVisualization = () => {
   }, [randomChance, generationvalue, generationtext]);
 
 useEffect(() => {
-  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
-    const links = [];
-    for (let i = 0; i < linkCount; i++) {
-      const source = Math.floor(Math.random() * nodeCount) + 1;
-      let target = Math.floor(Math.random() * nodeCount) + 1;
-      while (target === source) {
-        target = Math.floor(Math.random() * nodeCount) + 1;
-      }
-      links.push({ source, target });
-      nodes.find((node) => node.id === source).connections += 1;
-      nodes.find((node) => node.id === target).connections += 1;
-    }
-    return links;
-  };
+  // const generateRandomLinks = (nodeCount, linkCount, nodes) => {
+  //   const links = [];
+  //   for (let i = 0; i < linkCount; i++) {
+  //     const source = Math.floor(Math.random() * nodeCount) + 1;
+  //     let target = Math.floor(Math.random() * nodeCount) + 1;
+  //     while (target === source) {
+  //       target = Math.floor(Math.random() * nodeCount) + 1;
+  //     }
+  //     links.push({ source, target });
+  //     nodes.find((node) => node.id === source).connections += 1;
+  //     nodes.find((node) => node.id === target).connections += 1;
+  //   }
+  //   return links;
+  // };
 
     // Your graph data
-    var nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
-    var links = generateRandomLinks(150, 200, nodes);
+    var BAGraph = generateBarabasiAlbertGraph(50, 2);
+    var nodes = BAGraph.nodes;
+    var links = BAGraph.links;
 
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
@@ -190,13 +238,11 @@ useEffect(() => {
         d3
           .forceLink(links)
           .id((d) => d.id)
-          .distance(25) // Adjust the distance value as needed
       )
-      .force('charge', d3.forceManyBody().strength(-100))
+      .force('charge', d3.forceManyBody().strength(-500))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('x', d3.forceX(width / 2).strength(0.1)) // Adjust the strength as needed
-      .force('collision', d3.forceCollide().radius(15))
-      .force('y', d3.forceY(height / 2).strength(0.1));
+      .force('x', d3.forceX(width / 2).strength(0.1))
+      .force('y', d3.forceY(height / 2).strength(0.1))
 
       simulation.alphaDecay(0.01);
 
@@ -207,7 +253,7 @@ useEffect(() => {
       .enter()
       .append('line')
       .attr('stroke', '#999')
-      .attr('stroke-width', 1.5)
+      .attr('stroke-width', 1)
       .attr('stroke-opactiy', 0.6)
       .on('click', (event, d) => {
         // Assuming d.source and d.target are node IDs
@@ -238,7 +284,7 @@ useEffect(() => {
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
       .append('circle')
-      .attr('r', d => (7 + 1.25*d.connections))
+      .attr('r', d => (4 + 0.75*d.connections))
       .attr('fill', 'red')
       .on('click', (event, d) => {
         const clickedNodeId = d.id;
