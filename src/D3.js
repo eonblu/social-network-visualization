@@ -6,12 +6,20 @@ import './D3styles.css';
 const NetworkVisualization = () => {
   const svgRef = useRef();
   const wrapperRef = useRef();
+  const RightWrapperRef = useRef();
+  const CheckboxWrapperRef = useRef();
   const width = window.innerWidth * 0.8;
   const height = window.innerHeight * 0.8;
   var [randomChance, setRandomChance] = useState(0.7);
   var [randomChance2, setRandomChance2] = useState(0.7);
   var generationvalue = 0;
   let generationtext;
+
+  function getGraphData(nodesData, linksData) {
+    const nodes = nodesData.map((node) => ({ ...node }));
+    const links = linksData.map((link) => ({ ...link }));
+    return { nodes, links };
+  }
 
   function generateBarabasiAlbertGraph(nodeCount, k) {
     const nodes = Array.from({ length: nodeCount }, (_, index) => ({ id: index + 1, connections: 0 }));
@@ -47,7 +55,7 @@ const NetworkVisualization = () => {
   }
   
   function selectIndexWithProbability(probabilities) {
-    const randomValue = Math.random();
+    const randomValue = Math.random() * 1.2;
     let cumulativeProbability = 0;
   
     for (let i = 0; i < probabilities.length; i++) {
@@ -59,10 +67,40 @@ const NetworkVisualization = () => {
   
     return probabilities.length; // Default to the last index if not selected earlier
   }
-
+ 
+  function createProjectionGraph(nodes, links) {
+    const nodesGroup1 = nodes.filter(node => node.group === 1);
+    const projectedLinks = [];
+    
+    links.forEach((link1, index1) => {
+      links.forEach((link2, index2) => {
+        if (index1 !== index2 && link1.target === link2.target) {
+          const source1 = nodesGroup1.find(node => node.id === link1.source);
+          const source2 = nodesGroup1.find(node => node.id === link2.source);
+  
+          if (source1 && source2) {
+            // Create a new link in the projection graph
+            const newLink = { source: source1.id, target: source2.id };
+            // Check if the link already exists in the projected links
+            if (!projectedLinks.some(existingLink =>
+              (existingLink.source === newLink.source && existingLink.target === newLink.target) ||
+              (existingLink.source === newLink.target && existingLink.target === newLink.source)
+            )) {
+              projectedLinks.push(newLink);
+            }
+          }
+        }
+      });
+    });  
+    return {
+      nodes: nodesGroup1,
+      links: projectedLinks
+    };
+  }
+  
   const findNeighboringNodes = useCallback((clickedNodeId, newColor, svg, links, generation) => {
     // eslint-disable-next-line
-    if (generationvalue < generation) {generationvalue = generation; generationtext.text('Generation: ' +  generation)};
+    if (generationvalue < generation || generation === 1) {generationvalue = generation; generationtext.text('Generation: ' +  generation)};
     const connectedLinks = links.filter(
       (link) => link.source.id === clickedNodeId || link.target.id === clickedNodeId
     );
@@ -95,20 +133,20 @@ const NetworkVisualization = () => {
   }, [randomChance, generationvalue, generationtext]);
 
 useEffect(() => {
-  // const generateRandomLinks = (nodeCount, linkCount, nodes) => {
-  //   const links = [];
-  //   for (let i = 0; i < linkCount; i++) {
-  //     const source = Math.floor(Math.random() * nodeCount) + 1;
-  //     let target = Math.floor(Math.random() * nodeCount) + 1;
-  //     while (target === source) {
-  //       target = Math.floor(Math.random() * nodeCount) + 1;
-  //     }
-  //     links.push({ source, target });
-  //     nodes.find((node) => node.id === source).connections += 1;
-  //     nodes.find((node) => node.id === target).connections += 1;
-  //   }
-  //   return links;
-  // };
+  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
+    const links = [];
+    for (let i = 0; i < linkCount; i++) {
+      const source = Math.floor(Math.random() * nodeCount) + 1;
+      let target = Math.floor(Math.random() * nodeCount) + 1;
+      while (target === source) {
+        target = Math.floor(Math.random() * nodeCount) + 1;
+      }
+      links.push({ source, target });
+      nodes.find((node) => node.id === source).connections += 1;
+      nodes.find((node) => node.id === target).connections += 1;
+    }
+    return links;
+  };
 
     // Your graph data
     var BAGraph = generateBarabasiAlbertGraph(50, 2);
@@ -121,9 +159,41 @@ useEffect(() => {
     const resetGraph = (buttonID, resetZoom = true) => {
       // eslint-disable-next-line
       generationvalue = 0; generationtext.text('Generation: ' +  generationvalue);
-      if (buttonID === 1) {nodes = data.nodes1; links = data.links1}
-      else if (buttonID === 2) {nodes = data.nodes2; links = data.links2}
-      else if (buttonID === 3) {nodes = data.nodes3; links = data.links3};
+
+      let newGraph;
+
+      switch (buttonID) {
+        case 1:
+          newGraph = getGraphData(data.nodes1, data.links1);
+          break;
+        case 2:
+          newGraph = getGraphData(data.nodes2, data.links2);
+          break;
+        case 3:
+          newGraph = getGraphData(data.nodes3, data.links3);
+          break;
+        case 4:
+          newGraph = generateBarabasiAlbertGraph(50, 2);
+          break;
+        case 5:
+          nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
+          links = generateRandomLinks(150, 200, nodes);
+          newGraph = { nodes, links };
+          break;
+        case 6:
+          newGraph = getGraphData(data.nodesBi, data.linksBi);
+          break;
+        case 7:
+          newGraph = createProjectionGraph(data.nodesBi, data.linksBi);
+          console.log(newGraph);
+          break;
+        default:
+          break;
+      }
+    
+      nodes = newGraph.nodes;
+      links = newGraph.links;
+
       const currentZoomTransform = d3.zoomTransform(svg.node());
       // Reset SVG content
       d3.select(svgRef.current).selectAll("*").remove();
@@ -144,6 +214,10 @@ useEffect(() => {
         wrapperRef.current.prepend(buttonWrapper);
       
         // Add a button for resetting the graph
+        const buttonTextSample = document.createElement('span');
+        buttonTextSample.innerText = 'Text between buttons';
+        buttonWrapper.appendChild(buttonTextSample);
+
         const resetButton = document.createElement('button');
         resetButton.innerText = 'Sample Set 1';
         resetButton.addEventListener('click', () => resetGraph(1, true));
@@ -204,8 +278,79 @@ useEffect(() => {
 
         var sliderText2 = document.createElement('sliderText');
         sliderText2.innerText = 'Value ' + randomChance;
-        buttonWrapper.appendChild(sliderText2);         
-        };
+        buttonWrapper.appendChild(sliderText2);
+
+        const buttonTextAlgs = document.createElement('span');
+        buttonTextAlgs.innerText = 'Text between buttons';
+        buttonWrapper.appendChild(buttonTextAlgs);
+
+        const resetButton4 = document.createElement('button');
+        resetButton4.innerText = 'Barabasi Albert';
+        resetButton4.addEventListener('click', () => resetGraph(4, true));
+        resetButton4.classList.add('button');
+        buttonWrapper.appendChild(resetButton4);
+
+        const resetButton5 = document.createElement('button');
+        resetButton5.innerText = 'Random';
+        resetButton5.addEventListener('click', () => resetGraph(5, true));
+        resetButton5.classList.add('button');
+        buttonWrapper.appendChild(resetButton5);
+
+        const buttonTextSpr = document.createElement('span');
+        buttonTextSpr.innerText = 'Text between buttons';
+        buttonWrapper.appendChild(buttonTextSpr);
+
+        // Add a new checkbox
+        const RightWrapper = document.createElement('div');
+        RightWrapper.classList.add('right-wrapper');
+        RightWrapperRef.current.prepend(RightWrapper);
+
+        const resetButton6 = document.createElement('button');
+        resetButton6.innerText = 'Bipartite Graph';
+        resetButton6.addEventListener('click', () => resetGraph(6, true));
+        resetButton6.classList.add('button');
+        RightWrapper.appendChild(resetButton6);
+
+        const resetButton7 = document.createElement('button');
+        resetButton7.innerText = 'Projection Graph';
+        resetButton7.addEventListener('click', () => resetGraph(7, true));
+        resetButton7.classList.add('button');
+        RightWrapper.appendChild(resetButton7);
+
+        const CheckboxWrapper = document.createElement('div');
+        CheckboxWrapper.classList.add('checkbox-wrapper');
+        CheckboxWrapperRef.current.prepend(CheckboxWrapper);
+
+        const newCheckbox = document.createElement('input');
+        newCheckbox.type = 'checkbox';
+        newCheckbox.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox);
+
+        const newCheckbox2 = document.createElement('input');
+        newCheckbox2.type = 'checkbox';
+        newCheckbox2.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox2.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox2);
+
+        const newCheckbox3 = document.createElement('input');
+        newCheckbox3.type = 'checkbox';
+        newCheckbox3.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox3.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox3);
+
+        const newCheckbox4 = document.createElement('input');
+        newCheckbox4.type = 'checkbox';
+        newCheckbox4.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox4.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox4);
+
+        const newCheckbox5 = document.createElement('input');
+        newCheckbox5.type = 'checkbox';
+        newCheckbox5.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox5.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox5);
+      };
 
     // Create a zoom behavior
     const zoom = d3.zoom().on('zoom', (event) => {
@@ -238,6 +383,8 @@ useEffect(() => {
         d3
           .forceLink(links)
           .id((d) => d.id)
+          .strength((d) => 1 / Math.min(d.source.connections, d.target.connections))
+          .distance((d) => 50 * Math.exp(-0.1 * Math.max(d.source.connections, d.target.connections)))
       )
       .force('charge', d3.forceManyBody().strength(-500))
       .force('center', d3.forceCenter(width / 2, height / 2))
@@ -284,12 +431,11 @@ useEffect(() => {
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
       .append('circle')
-      .attr('r', d => (4 + 0.75*d.connections))
-      .attr('fill', 'red')
+      .attr('r', d => (6 + 0.75*d.connections))
+      .attr('fill', (d) => d.color)
       .on('click', (event, d) => {
         const clickedNodeId = d.id;
         const clickedNode = d3.select(event.currentTarget);
-        console.log(clickedNode);
         const currentColor = clickedNode.attr('fill');
         const newColor = currentColor === 'red' ? 'blue' : 'red';
         clickedNode.attr('fill', newColor);
@@ -329,6 +475,10 @@ createGraph();
 return (
   <div style={{ display: 'flex' }} ref={wrapperRef}>
     <svg ref={svgRef}></svg>
+    <div>
+      <div ref={RightWrapperRef} className="right-wrapper"></div>
+      <div ref={CheckboxWrapperRef} className="checkbox-wrapper"></div>
+    </div>
   </div>
 );
 };
