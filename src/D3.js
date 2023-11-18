@@ -161,7 +161,6 @@ useEffect(() => {
       generationvalue = 0; generationtext.text('Generation: ' +  generationvalue);
 
       let newGraph;
-
       switch (buttonID) {
         case 1:
           newGraph = getGraphData(data.nodes1, data.links1);
@@ -188,6 +187,7 @@ useEffect(() => {
           console.log(newGraph);
           break;
         default:
+          newGraph = {nodes, links};
           break;
       }
     
@@ -403,6 +403,7 @@ useEffect(() => {
       .attr('stroke-width', 1)
       .attr('stroke-opactiy', 0.6)
       .on('click', (event, d) => {
+
         // Assuming d.source and d.target are node IDs
         const sourceNode = d.source;
         const targetNode = d.target;
@@ -410,7 +411,7 @@ useEffect(() => {
         // Decrement the connections attribute for the source and target nodes
         if (sourceNode) sourceNode.connections -= 1;
         if (targetNode) targetNode.connections -= 1;
-    
+
         // Remove the clicked link from the links array
         links = links.filter(link => link !== d);
     
