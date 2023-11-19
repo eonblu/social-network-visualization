@@ -69,6 +69,7 @@ const NetworkVisualization = () => {
   }
  
   function createProjectionGraph(nodes, links) {
+    console.log(nodes, links);
     const nodesGroup1 = nodes.filter(node => node.group === 1);
     const projectedLinks = [];
     
@@ -91,7 +92,8 @@ const NetworkVisualization = () => {
           }
         }
       });
-    });  
+    });
+    console.log(nodesGroup1, projectedLinks);
     return {
       nodes: nodesGroup1,
       links: projectedLinks
@@ -156,6 +158,82 @@ useEffect(() => {
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
+    const newCheckbox = document.createElement('input');
+    const newCheckbox2 = document.createElement('input');
+    const newCheckbox3 = document.createElement('input');
+    const newCheckbox4 = document.createElement('input');
+    const newCheckbox5 = document.createElement('input');
+    const newCheckbox6 = document.createElement('input');
+    const newCheckbox7 = document.createElement('input');
+    const newCheckbox8 = document.createElement('input');
+    const newCheckbox9 = document.createElement('input');
+    const newCheckbox10 = document.createElement('input');
+
+    const updateBipartiteGraph = (resetZoom = true, inputnodes, inputlinks) => {
+      // eslint-disable-next-line
+      generationvalue = 0; generationtext.text('Generation: ' +  generationvalue);
+
+      let newGraph;
+      newGraph = getGraphData(inputnodes, inputlinks)
+
+      const selectedNodeIds = new Set();
+
+      selectedNodeIds.add(1).add(2).add(3).add(4).add(5);
+
+      if (newCheckbox.checked) {
+        selectedNodeIds.add(6);
+      }
+      if (newCheckbox2.checked) {
+        selectedNodeIds.add(7);
+      }
+      if (newCheckbox3.checked) {
+        selectedNodeIds.add(8);
+      }
+      if (newCheckbox4.checked) {
+        selectedNodeIds.add(9);
+      }
+      if (newCheckbox5.checked) {
+        selectedNodeIds.add(10);
+      }
+      if (newCheckbox6.checked) {
+        selectedNodeIds.add(11);
+      }
+      if (newCheckbox7.checked) {
+        selectedNodeIds.add(12);
+      }
+      if (newCheckbox8.checked) {
+        selectedNodeIds.add(13);
+      }
+      if (newCheckbox9.checked) {
+        selectedNodeIds.add(14);
+      }
+      if (newCheckbox10.checked) {
+        selectedNodeIds.add(15);
+      }
+
+      // Filter nodes and links based on selected nodes
+      const filteredNodes = newGraph.nodes.filter((node) => selectedNodeIds.has(node.id));
+      const filteredLinks = newGraph.links.filter((link) => selectedNodeIds.has(link.target));
+
+      console.log(filteredNodes, filteredLinks);
+
+      newGraph = createProjectionGraph(filteredNodes, filteredLinks);
+
+      nodes = newGraph.nodes;
+      links = newGraph.links;
+
+      const currentZoomTransform = d3.zoomTransform(svg.node());
+      d3.select(svgRef.current).selectAll("*").remove();
+      drawArea = svg.select('.drawArea');
+      createGraph();
+      if (!resetZoom) {
+        drawArea.attr('transform', currentZoomTransform);
+        } 
+      else {
+        svg.call(zoom.transform, d3.zoomIdentity);
+      };
+      };
+
     const resetGraph = (buttonID, resetZoom = true) => {
       // eslint-disable-next-line
       generationvalue = 0; generationtext.text('Generation: ' +  generationvalue);
@@ -183,8 +261,8 @@ useEffect(() => {
           newGraph = getGraphData(data.nodesBi, data.linksBi);
           break;
         case 7:
-          newGraph = createProjectionGraph(data.nodesBi, data.linksBi);
-          console.log(newGraph);
+          newGraph = getGraphData(data.nodesBi, data.linksBi);
+          newGraph = createProjectionGraph(newGraph.nodes, newGraph.links);
           break;
         default:
           newGraph = {nodes, links};
@@ -321,35 +399,65 @@ useEffect(() => {
         CheckboxWrapper.classList.add('checkbox-wrapper');
         CheckboxWrapperRef.current.prepend(CheckboxWrapper);
 
-        const newCheckbox = document.createElement('input');
-        newCheckbox.type = 'checkbox';
-        newCheckbox.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox.type = 'checkbox'
+        newCheckbox.checked = true;
+        newCheckbox.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox.classList.add('checkboxes');
         CheckboxWrapper.appendChild(newCheckbox);
 
-        const newCheckbox2 = document.createElement('input');
-        newCheckbox2.type = 'checkbox';
-        newCheckbox2.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox2.type = 'checkbox'
+        newCheckbox2.checked = true;
+        newCheckbox2.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox2.classList.add('checkboxes');
         CheckboxWrapper.appendChild(newCheckbox2);
 
-        const newCheckbox3 = document.createElement('input');
-        newCheckbox3.type = 'checkbox';
-        newCheckbox3.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox3.type = 'checkbox'
+        newCheckbox3.checked = true;
+        newCheckbox3.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox3.classList.add('checkboxes');
         CheckboxWrapper.appendChild(newCheckbox3);
 
-        const newCheckbox4 = document.createElement('input');
-        newCheckbox4.type = 'checkbox';
-        newCheckbox4.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox4.type = 'checkbox'
+        newCheckbox4.checked = true;
+        newCheckbox4.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox4.classList.add('checkboxes');
         CheckboxWrapper.appendChild(newCheckbox4);
 
-        const newCheckbox5 = document.createElement('input');
-        newCheckbox5.type = 'checkbox';
-        newCheckbox5.addEventListener('change', () => resetGraph(6, true));
+        newCheckbox5.type = 'checkbox'
+        newCheckbox5.checked = true;
+        newCheckbox5.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox5.classList.add('checkboxes');
         CheckboxWrapper.appendChild(newCheckbox5);
+
+        newCheckbox6.type = 'checkbox'
+        newCheckbox6.checked = true;
+        newCheckbox6.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        newCheckbox6.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox6);
+
+        newCheckbox7.type = 'checkbox'
+        newCheckbox7.checked = true;
+        newCheckbox7.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        newCheckbox7.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox7);
+
+        newCheckbox8.type = 'checkbox'
+        newCheckbox8.checked = true;
+        newCheckbox8.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        newCheckbox8.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox8);
+
+        newCheckbox9.type = 'checkbox'
+        newCheckbox9.checked = true;
+        newCheckbox9.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        newCheckbox9.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox9);
+
+        newCheckbox10.type = 'checkbox'
+        newCheckbox10.checked = true;
+        newCheckbox10.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        newCheckbox10.classList.add('checkboxes');
+        CheckboxWrapper.appendChild(newCheckbox10);
       };
 
     // Create a zoom behavior
