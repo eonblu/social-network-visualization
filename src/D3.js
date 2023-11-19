@@ -168,6 +168,7 @@ useEffect(() => {
     const newCheckbox8 = document.createElement('input');
     const newCheckbox9 = document.createElement('input');
     const newCheckbox10 = document.createElement('input');
+    var switchElement = document.createElement('input');
 
     const updateBipartiteGraph = (resetZoom = true, inputnodes, inputlinks) => {
       // eslint-disable-next-line
@@ -215,12 +216,15 @@ useEffect(() => {
       const filteredNodes = newGraph.nodes.filter((node) => selectedNodeIds.has(node.id));
       const filteredLinks = newGraph.links.filter((link) => selectedNodeIds.has(link.target));
 
-      console.log(filteredNodes, filteredLinks);
-
-      newGraph = createProjectionGraph(filteredNodes, filteredLinks);
-
-      nodes = newGraph.nodes;
-      links = newGraph.links;
+      if (switchElement.checked) {
+        newGraph = createProjectionGraph(filteredNodes, filteredLinks);
+        nodes = newGraph.nodes;
+        links = newGraph.links;
+      }
+      else {
+        nodes = filteredNodes;
+        links = filteredLinks;
+      };
 
       const currentZoomTransform = d3.zoomTransform(svg.node());
       d3.select(svgRef.current).selectAll("*").remove();
@@ -394,6 +398,20 @@ useEffect(() => {
         resetButton7.addEventListener('click', () => resetGraph(7, true));
         resetButton7.classList.add('button');
         RightWrapper.appendChild(resetButton7);
+
+        const SwitchText = document.createElement('span');
+        SwitchText.innerText = 'Switch between bipartite and projection view';
+        RightWrapper.appendChild(SwitchText);
+
+        var switchContainer = document.createElement("label");
+        switchContainer.className = "switch";
+        var switchLabel = document.createElement("span");
+        switchLabel.className = "toggleswitch";
+        switchElement.type = "checkbox";
+        switchElement.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        switchContainer.appendChild(switchElement);
+        switchContainer.appendChild(switchLabel);
+        RightWrapper.appendChild(switchContainer);
 
         const CheckboxWrapper = document.createElement('div');
         CheckboxWrapper.classList.add('checkbox-wrapper');
