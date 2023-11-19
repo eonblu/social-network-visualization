@@ -297,7 +297,7 @@ useEffect(() => {
       
         // Add a button for resetting the graph
         const buttonTextSample = document.createElement('span');
-        buttonTextSample.innerText = 'Text between buttons';
+        buttonTextSample.innerText = 'Sample Sets';
         buttonWrapper.appendChild(buttonTextSample);
 
         const resetButton = document.createElement('button');
@@ -325,6 +325,26 @@ useEffect(() => {
           randomChance = newRandomChance;
           sliderText.innerHTML = 'Value ' + randomChance;
         };
+
+        const buttonTextAlgs = document.createElement('span');
+        buttonTextAlgs.innerText = 'Algorithmic Graph Creation';
+        buttonWrapper.appendChild(buttonTextAlgs);
+
+        const resetButton4 = document.createElement('button');
+        resetButton4.innerText = 'Barabasi Albert';
+        resetButton4.addEventListener('click', () => resetGraph(4, true));
+        resetButton4.classList.add('button');
+        buttonWrapper.appendChild(resetButton4);
+
+        const resetButton5 = document.createElement('button');
+        resetButton5.innerText = 'Random';
+        resetButton5.addEventListener('click', () => resetGraph(5, true));
+        resetButton5.classList.add('button');
+        buttonWrapper.appendChild(resetButton5);
+
+        const buttonTextSpr = document.createElement('span');
+        buttonTextSpr.innerText = 'Values for spread*';
+        buttonWrapper.appendChild(buttonTextSpr);
 
         const slider = document.createElement('input');
         slider.type = 'range';
@@ -361,26 +381,6 @@ useEffect(() => {
         var sliderText2 = document.createElement('sliderText');
         sliderText2.innerText = 'Value ' + randomChance;
         buttonWrapper.appendChild(sliderText2);
-
-        const buttonTextAlgs = document.createElement('span');
-        buttonTextAlgs.innerText = 'Text between buttons';
-        buttonWrapper.appendChild(buttonTextAlgs);
-
-        const resetButton4 = document.createElement('button');
-        resetButton4.innerText = 'Barabasi Albert';
-        resetButton4.addEventListener('click', () => resetGraph(4, true));
-        resetButton4.classList.add('button');
-        buttonWrapper.appendChild(resetButton4);
-
-        const resetButton5 = document.createElement('button');
-        resetButton5.innerText = 'Random';
-        resetButton5.addEventListener('click', () => resetGraph(5, true));
-        resetButton5.classList.add('button');
-        buttonWrapper.appendChild(resetButton5);
-
-        const buttonTextSpr = document.createElement('span');
-        buttonTextSpr.innerText = 'Text between buttons';
-        buttonWrapper.appendChild(buttonTextSpr);
 
         // Add a new checkbox
         const RightWrapper = document.createElement('div');
@@ -509,8 +509,8 @@ useEffect(() => {
         d3
           .forceLink(links)
           .id((d) => d.id)
-          .strength((d) => 1 / Math.min(d.source.connections, d.target.connections))
-          .distance((d) => 50 * Math.exp(-0.1 * Math.max(d.source.connections, d.target.connections)))
+          .strength((d) => 1 / ((Math.min(d.source.connections, d.target.connections))+1))
+          .distance((d) => 50 * Math.exp(-0.1 * Math.max(d.source.connections, d.target.connections, 1)))
       )
       .force('charge', d3.forceManyBody().strength(-500))
       .force('center', d3.forceCenter(width / 2, height / 2))
@@ -559,7 +559,8 @@ useEffect(() => {
       .attr('stroke-width', 3)
       .append('circle')
       .attr('r', d => (6 + 0.75*d.connections))
-      .attr('fill', (d) => d.color)
+      .attr('fill', 'red')
+      .attr('fill', (d) => d.color || 'red')
       .on('click', (event, d) => {
         const clickedNodeId = d.id;
         const clickedNode = d3.select(event.currentTarget);
