@@ -336,6 +336,7 @@ useEffect(() => {
         // Add a button for resetting the graph
         const buttonTextSample = document.createElement('span');
         buttonTextSample.innerText = 'Sample Sets';
+        buttonTextSample.classList.add('sectionTitle');
         buttonWrapper.appendChild(buttonTextSample);
 
         const resetButton = document.createElement('button');
@@ -358,11 +359,12 @@ useEffect(() => {
 
         const buttonTextAlgs = document.createElement('span');
         buttonTextAlgs.innerText = 'Algorithmic Graph Creation';
+        buttonTextAlgs.classList.add('sectionTitle');
         buttonWrapper.appendChild(buttonTextAlgs);
 
         const resetButton4 = document.createElement('button');
         resetButton4.innerText = 'Barabasi Albert';
-        resetButton4.addEventListener('click', () => resetGraph(4, true));
+        resetButton4.addEventListener('click', () => resetGraph(4, false));
         resetButton4.classList.add('button');
         buttonWrapper.appendChild(resetButton4);
 
@@ -371,7 +373,7 @@ useEffect(() => {
           setnodeAmountBA(newRandomChance2);
           // eslint-disable-next-line
           nodeAmountBA = newRandomChance2;
-          sliderBA1Text.innerHTML = 'Value ' + nodeAmountBA;
+          sliderBA1Text.innerHTML = '# of nodes ' + nodeAmountBA;
         };
 
         const sliderBA1 = document.createElement('input');
@@ -385,7 +387,8 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderBA1);
 
         var sliderBA1Text = document.createElement('sliderText');
-        sliderBA1Text.innerText = 'Value ' + nodeAmountBA;
+        sliderBA1Text.innerHTML = '# of nodes ' + nodeAmountBA;
+        sliderBA1Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderBA1Text);
 
         const handleinitialmBAChange = (event) => {
@@ -393,7 +396,7 @@ useEffect(() => {
           setinitialmBA(newRandomChance2);
           // eslint-disable-next-line
           initialmBA = newRandomChance2;
-          sliderBA2Text.innerHTML = 'Value ' + initialmBA;
+          sliderBA2Text.innerHTML = 'Initial Connections ' + initialmBA;
         };
 
         const sliderBA2 = document.createElement('input');
@@ -407,12 +410,13 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderBA2);
 
         var sliderBA2Text = document.createElement('sliderText');
-        sliderBA2Text.innerText = 'Value ' + initialmBA;
+        sliderBA2Text.innerHTML = 'Initial Connections ' + initialmBA;
+        sliderBA2Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderBA2Text);
 
         const resetButton5 = document.createElement('button');
         resetButton5.innerText = 'Random';
-        resetButton5.addEventListener('click', () => resetGraph(5, true));
+        resetButton5.addEventListener('click', () => resetGraph(5, false));
         resetButton5.classList.add('button');
         buttonWrapper.appendChild(resetButton5);
 
@@ -421,7 +425,7 @@ useEffect(() => {
           setnodeAmountRandom(newRandomChance2);
           // eslint-disable-next-line
           nodeAmountRandom = newRandomChance2;
-          sliderR1Text.innerHTML = 'Value ' + nodeAmountRandom;
+          sliderR1Text.innerHTML = '# of nodes ' + nodeAmountRandom;
         };
 
         const sliderR1 = document.createElement('input');
@@ -435,7 +439,8 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderR1);
 
         var sliderR1Text = document.createElement('sliderText');
-        sliderR1Text.innerText = 'Value ' + nodeAmountRandom;
+        sliderR1Text.innerHTML = '# of nodes ' + nodeAmountRandom;
+        sliderR1Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderR1Text);
 
         const handleRChanceChange = (event) => {
@@ -443,13 +448,13 @@ useEffect(() => {
           setRandomGraphChance(newRandomChance2);
           // eslint-disable-next-line
           randomChance = newRandomChance2;
-          sliderR2Text.innerHTML = 'Value ' + randomChance;
+          sliderR2Text.innerHTML = 'Edge probability ' + Math.round(randomChance*100) + '%';
         };
 
         const sliderR2 = document.createElement('input');
         sliderR2.type = 'range';
         sliderR2.min = 0;
-        sliderR2.max = 1;
+        sliderR2.max = 0.3;
         sliderR2.step = 0.01;
         sliderR2.value = randomChance;
         sliderR2.classList.add('slider');
@@ -457,19 +462,29 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderR2);
 
         var sliderR2Text = document.createElement('sliderText');
-        sliderR2Text.innerText = 'Value ' + randomChance;
+        sliderR2Text.innerHTML = 'Edge probability ' + Math.round(randomChance*100) + '%';
+        sliderR2Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderR2Text);
+
+        const SpreadWrapper = document.createElement('div');
+        SpreadWrapper.classList.add('right-wrapper');
+        RightWrapperRef.current.prepend(SpreadWrapper);
+
+        const buttonTextSpread = document.createElement('span');
+        buttonTextSpread.innerText = 'Spread';
+        buttonTextSpread.classList.add('sectionTitle');
+        SpreadWrapper.appendChild(buttonTextSpread);
 
         const buttonTextSpr = document.createElement('span');
         buttonTextSpr.innerText = 'Values for spread*';
-        buttonWrapper.appendChild(buttonTextSpr);
+        SpreadWrapper.appendChild(buttonTextSpr);
 
         const handleRandomChanceChange = (event) => {
           const newRandomChance = parseFloat(event.target.value);
           setRandomChance(newRandomChance);
           // eslint-disable-next-line
           infectionRate = newRandomChance;
-          sliderText.innerHTML = 'Value ' + infectionRate;
+          sliderText.innerHTML = 'Infection rate ' + Math.round(infectionRate*100) + '%';
         };
 
         const slider = document.createElement('input');
@@ -480,18 +495,19 @@ useEffect(() => {
         slider.value = infectionRate;
         slider.classList.add('slider');
         slider.addEventListener('input', handleRandomChanceChange);
-        buttonWrapper.appendChild(slider);
+        SpreadWrapper.appendChild(slider);
 
         var sliderText = document.createElement('sliderText');
-        sliderText.innerText = 'Value ' + infectionRate;
-        buttonWrapper.appendChild(sliderText);
+        sliderText.innerHTML = 'Infection rate ' + Math.round(infectionRate*100) + '%';
+        sliderText.classList.add('sliderText');
+        SpreadWrapper.appendChild(sliderText);
 
         const handleRandomChanceChange2 = (event) => {
           const newRandomChance2 = parseFloat(event.target.value);
           setRandomChance2(newRandomChance2);
           // eslint-disable-next-line
           maskRate = newRandomChance2;
-          sliderText2.innerHTML = 'Value ' + maskRate;
+          sliderText2.innerHTML = 'Mask Rate ' + Math.round(maskRate*100) + '%';
         };
 
         const slider2 = document.createElement('input');
@@ -502,32 +518,33 @@ useEffect(() => {
         slider2.value = maskRate;
         slider2.classList.add('slider');
         slider2.addEventListener('input', handleRandomChanceChange2);
-        buttonWrapper.appendChild(slider2);
+        SpreadWrapper.appendChild(slider2);
 
         var sliderText2 = document.createElement('sliderText');
-        sliderText2.innerText = 'Value ' + maskRate;
-        buttonWrapper.appendChild(sliderText2);
+        sliderText2.innerHTML = 'Mask Rate ' + Math.round(maskRate*100) + '%';
+        sliderText2.classList.add('sliderText');
+        SpreadWrapper.appendChild(sliderText2);
 
-        // Add a new checkbox
-        const RightWrapper = document.createElement('div');
-        RightWrapper.classList.add('right-wrapper');
-        RightWrapperRef.current.prepend(RightWrapper);
+        const buttonTextResi = document.createElement('span');
+        buttonTextResi.innerText = 'Resilience';
+        buttonTextResi.classList.add('sectionTitle');
+        SpreadWrapper.appendChild(buttonTextResi);
 
         const resetButton6 = document.createElement('button');
         resetButton6.innerText = 'Bipartite Graph';
         resetButton6.addEventListener('click', () => resetGraph(6, true));
         resetButton6.classList.add('button');
-        RightWrapper.appendChild(resetButton6);
+        SpreadWrapper.appendChild(resetButton6);
 
         const resetButton7 = document.createElement('button');
         resetButton7.innerText = 'Projection Graph';
         resetButton7.addEventListener('click', () => resetGraph(7, true));
         resetButton7.classList.add('button');
-        RightWrapper.appendChild(resetButton7);
+        SpreadWrapper.appendChild(resetButton7);
 
         const SwitchText = document.createElement('span');
         SwitchText.innerText = 'Switch between bipartite and projection view';
-        RightWrapper.appendChild(SwitchText);
+        SpreadWrapper.appendChild(SwitchText);
 
         var switchContainer = document.createElement("label");
         switchContainer.className = "switch";
@@ -537,71 +554,71 @@ useEffect(() => {
         switchElement.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         switchContainer.appendChild(switchElement);
         switchContainer.appendChild(switchLabel);
-        RightWrapper.appendChild(switchContainer);
+        SpreadWrapper.appendChild(switchContainer);
 
-        const CheckboxWrapper = document.createElement('div');
-        CheckboxWrapper.classList.add('checkbox-wrapper');
-        CheckboxWrapperRef.current.prepend(CheckboxWrapper);
+        const ResilienceWrapper = document.createElement('div');
+        ResilienceWrapper.classList.add('checkbox-wrapper');
+        CheckboxWrapperRef.current.prepend(ResilienceWrapper);
 
         newCheckbox.type = 'checkbox'
         newCheckbox.checked = true;
         newCheckbox.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox);
+        ResilienceWrapper.appendChild(newCheckbox);
 
         newCheckbox2.type = 'checkbox'
         newCheckbox2.checked = true;
         newCheckbox2.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox2.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox2);
+        ResilienceWrapper.appendChild(newCheckbox2);
 
         newCheckbox3.type = 'checkbox'
         newCheckbox3.checked = true;
         newCheckbox3.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox3.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox3);
+        ResilienceWrapper.appendChild(newCheckbox3);
 
         newCheckbox4.type = 'checkbox'
         newCheckbox4.checked = true;
         newCheckbox4.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox4.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox4);
+        ResilienceWrapper.appendChild(newCheckbox4);
 
         newCheckbox5.type = 'checkbox'
         newCheckbox5.checked = true;
         newCheckbox5.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox5.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox5);
+        ResilienceWrapper.appendChild(newCheckbox5);
 
         newCheckbox6.type = 'checkbox'
         newCheckbox6.checked = true;
         newCheckbox6.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox6.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox6);
+        ResilienceWrapper.appendChild(newCheckbox6);
 
         newCheckbox7.type = 'checkbox'
         newCheckbox7.checked = true;
         newCheckbox7.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox7.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox7);
+        ResilienceWrapper.appendChild(newCheckbox7);
 
         newCheckbox8.type = 'checkbox'
         newCheckbox8.checked = true;
         newCheckbox8.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox8.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox8);
+        ResilienceWrapper.appendChild(newCheckbox8);
 
         newCheckbox9.type = 'checkbox'
         newCheckbox9.checked = true;
         newCheckbox9.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox9.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox9);
+        ResilienceWrapper.appendChild(newCheckbox9);
 
         newCheckbox10.type = 'checkbox'
         newCheckbox10.checked = true;
         newCheckbox10.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
         newCheckbox10.classList.add('checkboxes');
-        CheckboxWrapper.appendChild(newCheckbox10);
+        ResilienceWrapper.appendChild(newCheckbox10);
       };
 
     // Create a zoom behavior
@@ -722,8 +739,8 @@ return (
   <div style={{ display: 'flex' }} ref={wrapperRef}>
     <svg ref={svgRef}></svg>
     <div>
-      <div ref={RightWrapperRef} className="right-wrapper"></div>
-      <div ref={CheckboxWrapperRef} className="checkbox-wrapper"></div>
+      <div ref={RightWrapperRef}></div>
+      <div ref={CheckboxWrapperRef}></div>
     </div>
   </div>
 );

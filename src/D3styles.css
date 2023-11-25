@@ -5,6 +5,16 @@
   text-align: left;
 }
 
+.sectionTitle {
+  margin: 1.8vh 0vw 0.6vh 0vw;
+  font-weight: bold;
+}
+
+.sliderText {
+  margin: 0vw 0vw 0.15vw 0vw;
+  font-size: small;
+}
+
 .button-wrapper {
   display: flex;
   flex-direction: column;
@@ -16,7 +26,7 @@
 .button {
   width: 8vw; /* Adjust the width as needed */
   height: 5vh; /* Adjust the height as needed */
-  margin: 1vw; /* Adjust the margin as needed */
+  margin: 0.3vw 0.4vw 0.3vw 0.4vw; /* Adjust the margin as needed */
   border: none;
   background-color: #3498db;
   color: white;
@@ -32,7 +42,7 @@
   -webkit-appearance: none;
   width: 100%;
   height: 10px;
-  margin: 1vw;
+  margin: 0.8vw 0.4vw 0vw 0.4vw;
   border-radius: 1vw;  
   background: #d3d3d3;
   outline: none;
