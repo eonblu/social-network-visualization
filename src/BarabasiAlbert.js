@@ -45,6 +45,48 @@ function generateBarabasiAlbertGraph(nodeCount, k) {
     return probabilities.length; // Default to the last index if not selected earlier
   }
 
-// Example usage:
-const graph = generateBarabasiAlbertGraph(20, 2);
-console.log(graph);
+
+
+
+  
+  function generateBarabasiAlbertGraph(nodesCount, m) {
+
+    const nodes = Array.from({ length: nodesCount }, (_, i) => ({ id: i + 1, connections: 0 }));
+
+    const links = [];
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = i + 1; j <= m; j++) {
+        links.push({ source: i, target: j });
+        nodes[i - 1].connections++;
+        nodes[j - 1].connections++;
+      }
+    }
+    for (let i = m + 1; i <= nodesCount; i++) {
+      const probabilities = nodes.map(node => node.connections / (2 * links.length));
+      console.log(probabilities);
+  
+      for (let j = 0; j < m; j++) {
+        const targetIndex = selectNode(probabilities);
+        links.push({ source: i, target: nodes[targetIndex].id });
+        nodes[i - 1].connections++;
+        nodes[targetIndex].connections++;
+      }
+    }
+  
+    return { nodes, links };
+  }
+
+  function selectNode(probabilities) {
+    const rand = Math.random();
+    let cumulativeProbability = 0;
+  
+    for (let i = 0; i < probabilities.length; i++) {
+      cumulativeProbability += probabilities[i];
+      if (rand <= cumulativeProbability) {
+        console.log(i);
+        return i;
+      }
+    }
+    return probabilities.length - 1;
+  }

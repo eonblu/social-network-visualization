@@ -10,66 +10,75 @@ const NetworkVisualization = () => {
   const CheckboxWrapperRef = useRef();
   const width = window.innerWidth * 0.8;
   const height = window.innerHeight * 0.8;
-  var [randomChance, setRandomChance] = useState(0.7);
-  var [randomChance2, setRandomChance2] = useState(0.7);
+  var [nodeAmountBA, setnodeAmountBA] = useState(50); // Amount of Nodes BA
+  var [initialmBA, setinitialmBA] = useState (3); // Connections for each new node BA 
+  var [nodeAmountRandom, setnodeAmountRandom] = useState(50); // Amount of Nodes Random Graph
+  var [randomChance, setRandomGraphChance] = useState(0.05); // Random Chance Random Graph
+  var [infectionRate, setRandomChance] = useState(0.7); // Infectionrate
+  var [maskRate, setRandomChance2] = useState(0.7); // Maskrate
   var generationvalue = 0;
   let generationtext;
 
-  function getGraphData(nodesData, linksData) {
+  function getGraphData(nodesData, linksData, countConnections) {
     const nodes = nodesData.map((node) => ({ ...node }));
-    const links = linksData.map((link) => ({ ...link }));
+    const links = linksData.map((link) => ({ ...link }));    
+    if (countConnections) {
+      nodes.forEach((node) => {
+        node.connections = 0;
+      });
+    
+      links.forEach((link) => {
+        const sourceNode = nodes.find((node) => node.id === link.source);
+        const targetNode = nodes.find((node) => node.id === link.target);
+    
+        if (sourceNode) sourceNode.connections += 1;
+        if (targetNode) targetNode.connections += 1;
+      });
+    }
     return { nodes, links };
   }
 
-  function generateBarabasiAlbertGraph(nodeCount, k) {
-    const nodes = Array.from({ length: nodeCount }, (_, index) => ({ id: index + 1, connections: 0 }));
+  function generateBarabasiAlbertGraph(nodesCount, m) {
+
+    const nodes = Array.from({ length: nodesCount }, (_, i) => ({ id: i + 1, connections: 0 }));
+
     const links = [];
-  
-    for (let i = k + 1; i <= nodeCount; i++) {
-      const probabilities = calculateProbabilities(nodes, links);
-      const selectedTargets = selectTargets(probabilities, k);
-  
-      for (const target of selectedTargets) {
-        links.push({ source: i, target });
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = i + 1; j <= m; j++) {
+        links.push({ source: i, target: j });
         nodes[i - 1].connections++;
-        nodes[target - 1].connections++;
+        nodes[j - 1].connections++;
+      }
+    }
+    for (let i = m + 1; i <= nodesCount; i++) {
+      const probabilities = nodes.map(node => node.connections / (2 * links.length));
+  
+      for (let j = 0; j < m; j++) {
+        const targetIndex = selectNode(probabilities);
+        links.push({ source: i, target: nodes[targetIndex].id });
+        nodes[i - 1].connections++;
+        nodes[targetIndex].connections++;
       }
     }
   
     return { nodes, links };
   }
-  
-  function calculateProbabilities(nodes, links) {
-    const probabilities = nodes.map(node => node.connections);
-    const totalConnections = links.length * 2;
-  
-    return probabilities.map(connections => connections / totalConnections);
-  }
-  
-  function selectTargets(probabilities, k) {
-    const targets = [];
-    for (let i = 0; i < k; i++) {
-      targets.push(selectIndexWithProbability(probabilities));
-    }
-    return targets;
-  }
-  
-  function selectIndexWithProbability(probabilities) {
-    const randomValue = Math.random() * 1.2;
+
+  function selectNode(probabilities) {
+    const rand = Math.random();
     let cumulativeProbability = 0;
   
     for (let i = 0; i < probabilities.length; i++) {
       cumulativeProbability += probabilities[i];
-      if (randomValue <= cumulativeProbability) {
-        return i + 1; // Convert from 0-based index to 1-based index
+      if (rand <= cumulativeProbability) {
+        return i;
       }
     }
-  
-    return probabilities.length; // Default to the last index if not selected earlier
+    return probabilities.length - 1;
   }
  
   function createProjectionGraph(nodes, links) {
-    console.log(nodes, links);
     const nodesGroup1 = nodes.filter(node => node.group === 1);
     const projectedLinks = [];
     
@@ -81,19 +90,23 @@ const NetworkVisualization = () => {
   
           if (source1 && source2) {
             // Create a new link in the projection graph
-            const newLink = { source: source1.id, target: source2.id };
+            const newLink = { source: source1.id, target: source2.id, connections: 0 };
             // Check if the link already exists in the projected links
-            if (!projectedLinks.some(existingLink =>
+            const existingLinkIndex = projectedLinks.findIndex(existingLink =>
               (existingLink.source === newLink.source && existingLink.target === newLink.target) ||
               (existingLink.source === newLink.target && existingLink.target === newLink.source)
-            )) {
+            );
+  
+            if (existingLinkIndex === -1) {
               projectedLinks.push(newLink);
+            } else {
+              // Increment connections for the existing link
+              projectedLinks[existingLinkIndex].connections += 1;
             }
           }
         }
       });
     });
-    console.log(nodesGroup1, projectedLinks);
     return {
       nodes: nodesGroup1,
       links: projectedLinks
@@ -113,7 +126,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.target.id)
           .select('circle');
-        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && Math.random() < randomChance) {
+        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && Math.random() < infectionRate) {
           setTimeout(() => {
             targetNode.attr('fill', newColor);
             findNeighboringNodes(link.target.id, newColor, svg, links, generation + 1);
@@ -124,7 +137,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.source.id)
           .select('circle');
-        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && Math.random() < randomChance) {
+        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && Math.random() < infectionRate) {
           setTimeout(() => {
             sourceNode.attr('fill', newColor);
             findNeighboringNodes(link.source.id, newColor, svg, links, generation + 1);
@@ -132,10 +145,11 @@ const NetworkVisualization = () => {
         }
       }
     });
-  }, [randomChance, generationvalue, generationtext]);
+  }, [infectionRate, generationvalue, generationtext]);
 
 useEffect(() => {
-  const generateRandomLinks = (nodeCount, linkCount, nodes) => {
+  // eslint-disable-next-line
+  const generateRandomLinksOld = (nodeCount, linkCount, nodes) => {
     const links = [];
     for (let i = 0; i < linkCount; i++) {
       const source = Math.floor(Math.random() * nodeCount) + 1;
@@ -150,8 +164,24 @@ useEffect(() => {
     return links;
   };
 
+  function generateRandomLinks(nodes, k) {
+    const links = [];
+  
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        if (Math.random() < k) {
+          // Connect nodes with probability k
+          links.push({ source: nodes[i].id, target: nodes[j].id });
+          nodes[i].connections += 1;
+          nodes[j].connections += 1;
+        }
+      }
+    }
+    return links;
+  }
+
     // Your graph data
-    var BAGraph = generateBarabasiAlbertGraph(50, 2);
+    var BAGraph = generateBarabasiAlbertGraph(15, 2);
     var nodes = BAGraph.nodes;
     var links = BAGraph.links;
 
@@ -216,6 +246,14 @@ useEffect(() => {
       const filteredNodes = newGraph.nodes.filter((node) => selectedNodeIds.has(node.id));
       const filteredLinks = newGraph.links.filter((link) => selectedNodeIds.has(link.target));
 
+      filteredLinks.forEach((link) => {
+        const sourceNode = filteredNodes.find((node) => node.id === link.source);
+        const targetNode = filteredNodes.find((node) => node.id === link.target);
+    
+        if (sourceNode) sourceNode.connections += 1;
+        if (targetNode) targetNode.connections += 1;
+      });
+
       if (switchElement.checked) {
         newGraph = createProjectionGraph(filteredNodes, filteredLinks);
         nodes = newGraph.nodes;
@@ -245,27 +283,27 @@ useEffect(() => {
       let newGraph;
       switch (buttonID) {
         case 1:
-          newGraph = getGraphData(data.nodes1, data.links1);
+          newGraph = getGraphData(data.nodes1, data.links1, true);
           break;
         case 2:
-          newGraph = getGraphData(data.nodes2, data.links2);
+          newGraph = getGraphData(data.nodes2, data.links2, true);
           break;
         case 3:
-          newGraph = getGraphData(data.nodes3, data.links3);
+          newGraph = getGraphData(data.nodes3, data.links3, true);
           break;
         case 4:
-          newGraph = generateBarabasiAlbertGraph(50, 2);
+          newGraph = generateBarabasiAlbertGraph(nodeAmountBA, initialmBA);
           break;
         case 5:
-          nodes = d3.range(1, 151).map((i) => ({ id: i, connections: 0 }));
-          links = generateRandomLinks(150, 200, nodes);
+          nodes = d3.range(1, nodeAmountRandom + 1).map((i) => ({ id: i, connections: 0 }));
+          links = generateRandomLinks(nodes, randomChance);
           newGraph = { nodes, links };
           break;
         case 6:
-          newGraph = getGraphData(data.nodesBi, data.linksBi);
+          newGraph = getGraphData(data.nodesBi, data.linksBi, true);
           break;
         case 7:
-          newGraph = getGraphData(data.nodesBi, data.linksBi);
+          newGraph = getGraphData(data.nodesBi, data.linksBi, true);
           newGraph = createProjectionGraph(newGraph.nodes, newGraph.links);
           break;
         default:
@@ -318,14 +356,6 @@ useEffect(() => {
         resetButton3.classList.add('button');
         buttonWrapper.appendChild(resetButton3);
 
-        const handleRandomChanceChange = (event) => {
-          const newRandomChance = parseFloat(event.target.value);
-          setRandomChance(newRandomChance);
-          // eslint-disable-next-line
-          randomChance = newRandomChance;
-          sliderText.innerHTML = 'Value ' + randomChance;
-        };
-
         const buttonTextAlgs = document.createElement('span');
         buttonTextAlgs.innerText = 'Algorithmic Graph Creation';
         buttonWrapper.appendChild(buttonTextAlgs);
@@ -336,36 +366,132 @@ useEffect(() => {
         resetButton4.classList.add('button');
         buttonWrapper.appendChild(resetButton4);
 
+        const handlenodeAmountBAChange = (event) => {
+          const newRandomChance2 = parseFloat(event.target.value);
+          setnodeAmountBA(newRandomChance2);
+          // eslint-disable-next-line
+          nodeAmountBA = newRandomChance2;
+          sliderBA1Text.innerHTML = 'Value ' + nodeAmountBA;
+        };
+
+        const sliderBA1 = document.createElement('input');
+        sliderBA1.type = 'range';
+        sliderBA1.min = 30;
+        sliderBA1.max = 200;
+        sliderBA1.step = 5;
+        sliderBA1.value = nodeAmountBA;
+        sliderBA1.classList.add('slider');
+        sliderBA1.addEventListener('input', handlenodeAmountBAChange);
+        buttonWrapper.appendChild(sliderBA1);
+
+        var sliderBA1Text = document.createElement('sliderText');
+        sliderBA1Text.innerText = 'Value ' + nodeAmountBA;
+        buttonWrapper.appendChild(sliderBA1Text);
+
+        const handleinitialmBAChange = (event) => {
+          const newRandomChance2 = parseFloat(event.target.value);
+          setinitialmBA(newRandomChance2);
+          // eslint-disable-next-line
+          initialmBA = newRandomChance2;
+          sliderBA2Text.innerHTML = 'Value ' + initialmBA;
+        };
+
+        const sliderBA2 = document.createElement('input');
+        sliderBA2.type = 'range';
+        sliderBA2.min = 1;
+        sliderBA2.max = 10;
+        sliderBA2.step = 1;
+        sliderBA2.value = initialmBA;
+        sliderBA2.classList.add('slider');
+        sliderBA2.addEventListener('input', handleinitialmBAChange);
+        buttonWrapper.appendChild(sliderBA2);
+
+        var sliderBA2Text = document.createElement('sliderText');
+        sliderBA2Text.innerText = 'Value ' + initialmBA;
+        buttonWrapper.appendChild(sliderBA2Text);
+
         const resetButton5 = document.createElement('button');
         resetButton5.innerText = 'Random';
         resetButton5.addEventListener('click', () => resetGraph(5, true));
         resetButton5.classList.add('button');
         buttonWrapper.appendChild(resetButton5);
 
+        const handlenodeAmountRChange = (event) => {
+          const newRandomChance2 = parseFloat(event.target.value);
+          setnodeAmountRandom(newRandomChance2);
+          // eslint-disable-next-line
+          nodeAmountRandom = newRandomChance2;
+          sliderR1Text.innerHTML = 'Value ' + nodeAmountRandom;
+        };
+
+        const sliderR1 = document.createElement('input');
+        sliderR1.type = 'range';
+        sliderR1.min = 30;
+        sliderR1.max = 200;
+        sliderR1.step = 5;
+        sliderR1.value = nodeAmountRandom;
+        sliderR1.classList.add('slider');
+        sliderR1.addEventListener('input', handlenodeAmountRChange);
+        buttonWrapper.appendChild(sliderR1);
+
+        var sliderR1Text = document.createElement('sliderText');
+        sliderR1Text.innerText = 'Value ' + nodeAmountRandom;
+        buttonWrapper.appendChild(sliderR1Text);
+
+        const handleRChanceChange = (event) => {
+          const newRandomChance2 = parseFloat(event.target.value);
+          setRandomGraphChance(newRandomChance2);
+          // eslint-disable-next-line
+          randomChance = newRandomChance2;
+          sliderR2Text.innerHTML = 'Value ' + randomChance;
+        };
+
+        const sliderR2 = document.createElement('input');
+        sliderR2.type = 'range';
+        sliderR2.min = 0;
+        sliderR2.max = 1;
+        sliderR2.step = 0.01;
+        sliderR2.value = randomChance;
+        sliderR2.classList.add('slider');
+        sliderR2.addEventListener('input', handleRChanceChange);
+        buttonWrapper.appendChild(sliderR2);
+
+        var sliderR2Text = document.createElement('sliderText');
+        sliderR2Text.innerText = 'Value ' + randomChance;
+        buttonWrapper.appendChild(sliderR2Text);
+
         const buttonTextSpr = document.createElement('span');
         buttonTextSpr.innerText = 'Values for spread*';
         buttonWrapper.appendChild(buttonTextSpr);
+
+        const handleRandomChanceChange = (event) => {
+          const newRandomChance = parseFloat(event.target.value);
+          setRandomChance(newRandomChance);
+          // eslint-disable-next-line
+          infectionRate = newRandomChance;
+          sliderText.innerHTML = 'Value ' + infectionRate;
+        };
 
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.min = 0;
         slider.max = 1;
         slider.step = 0.01;
-        slider.value = randomChance;
+        slider.value = infectionRate;
         slider.classList.add('slider');
         slider.addEventListener('input', handleRandomChanceChange);
         buttonWrapper.appendChild(slider);
 
         var sliderText = document.createElement('sliderText');
-        sliderText.innerText = 'Value ' + randomChance;
+        sliderText.innerText = 'Value ' + infectionRate;
         buttonWrapper.appendChild(sliderText);
 
         const handleRandomChanceChange2 = (event) => {
           const newRandomChance2 = parseFloat(event.target.value);
           setRandomChance2(newRandomChance2);
           // eslint-disable-next-line
-          randomChance2 = newRandomChance2;
-          sliderText2.innerHTML = 'Value ' + randomChance2;
+          maskRate = newRandomChance2;
+          sliderText2.innerHTML = 'Value ' + maskRate;
         };
 
         const slider2 = document.createElement('input');
@@ -373,13 +499,13 @@ useEffect(() => {
         slider2.min = 0;
         slider2.max = 1;
         slider2.step = 0.01;
-        slider2.value = randomChance;
+        slider2.value = maskRate;
         slider2.classList.add('slider');
         slider2.addEventListener('input', handleRandomChanceChange2);
         buttonWrapper.appendChild(slider2);
 
         var sliderText2 = document.createElement('sliderText');
-        sliderText2.innerText = 'Value ' + randomChance;
+        sliderText2.innerText = 'Value ' + maskRate;
         buttonWrapper.appendChild(sliderText2);
 
         // Add a new checkbox
@@ -526,22 +652,14 @@ useEffect(() => {
       .enter()
       .append('line')
       .attr('stroke', '#999')
-      .attr('stroke-width', 1)
+      .attr('stroke-width', d => 1.5 + d.connections || 1)
       .attr('stroke-opactiy', 0.6)
       .on('click', (event, d) => {
-
-        // Assuming d.source and d.target are node IDs
         const sourceNode = d.source;
         const targetNode = d.target;
-
-        // Decrement the connections attribute for the source and target nodes
         if (sourceNode) sourceNode.connections -= 1;
         if (targetNode) targetNode.connections -= 1;
-
-        // Remove the clicked link from the links array
         links = links.filter(link => link !== d);
-    
-        // Redraw the graph with the updated links
         resetGraph(0, false);
       });
 
@@ -558,7 +676,7 @@ useEffect(() => {
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
       .append('circle')
-      .attr('r', d => (6 + 0.75*d.connections))
+      .attr('r', d => (6 + 1.75*d.connections))
       .attr('fill', 'red')
       .attr('fill', (d) => d.color || 'red')
       .on('click', (event, d) => {
@@ -598,7 +716,7 @@ useEffect(() => {
 
 createGraph();
 
-}, [width, height, findNeighboringNodes, randomChance, generationvalue, generationtext]);
+}, [width, height, findNeighboringNodes, infectionRate, generationvalue, generationtext]);
 
 return (
   <div style={{ display: 'flex' }} ref={wrapperRef}>
