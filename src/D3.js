@@ -61,7 +61,6 @@ const NetworkVisualization = () => {
         nodes[targetIndex].connections++;
       }
     }
-  
     return { nodes, links };
   }
 
@@ -112,6 +111,13 @@ const NetworkVisualization = () => {
       links: projectedLinks
     };
   }
+
+  function infect(infRate, mRate) {
+    const chancevalue = Math.random();
+    if (chancevalue < (mRate * mRate)) {return (Math.random() < (0.02 * infRate))}
+    else if (chancevalue < mRate) {return (Math.random() < (0.15 * infRate))}
+    else {return (Math.random() < infRate)}
+  }
   
   const findNeighboringNodes = useCallback((clickedNodeId, newColor, svg, links, generation) => {
     // eslint-disable-next-line
@@ -126,7 +132,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.target.id)
           .select('circle');
-        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && Math.random() < infectionRate) {
+        if (!targetNode.empty() && targetNode.attr('fill') !== newColor && infect(infectionRate, maskRate)) {
           setTimeout(() => {
             targetNode.attr('fill', newColor);
             findNeighboringNodes(link.target.id, newColor, svg, links, generation + 1);
@@ -137,7 +143,7 @@ const NetworkVisualization = () => {
           .selectAll('.node-group')
           .filter((d) => d.id === link.source.id)
           .select('circle');
-        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && Math.random() < infectionRate) {
+        if (!sourceNode.empty() && sourceNode.attr('fill') !== newColor && infect(infectionRate, maskRate)) {
           setTimeout(() => {
             sourceNode.attr('fill', newColor);
             findNeighboringNodes(link.source.id, newColor, svg, links, generation + 1);
@@ -181,23 +187,36 @@ useEffect(() => {
   }
 
     // Your graph data
-    var BAGraph = generateBarabasiAlbertGraph(15, 2);
+    var BAGraph = generateBarabasiAlbertGraph(50, 3);
     var nodes = BAGraph.nodes;
     var links = BAGraph.links;
 
     const svg = d3.select(svgRef.current).attr('width', width).attr('height', height).style('border', '2px solid black');
     let drawArea = svg.select('.drawArea');
 
-    const newCheckbox = document.createElement('input');
-    const newCheckbox2 = document.createElement('input');
-    const newCheckbox3 = document.createElement('input');
-    const newCheckbox4 = document.createElement('input');
-    const newCheckbox5 = document.createElement('input');
-    const newCheckbox6 = document.createElement('input');
-    const newCheckbox7 = document.createElement('input');
-    const newCheckbox8 = document.createElement('input');
-    const newCheckbox9 = document.createElement('input');
-    const newCheckbox10 = document.createElement('input');
+    const Amazilia_fimbriata_box = document.createElement('input');
+    const Aphantochroa_cirrhochloris_box = document.createElement('input');
+    const Clytolaema_rubricauda_box = document.createElement('input');
+    const Glaucis_hirsuta_box = document.createElement('input');
+    const Leucochloris_albicollis_box = document.createElement('input');
+    const Phaethornis_eurynome_box = document.createElement('input');
+    const Phaethornis_squalidus_box = document.createElement('input');
+    const Rhamphodon_naevius_box = document.createElement('input');
+    const Thalurania_xglaucopis_box = document.createElement('input');
+    const Heliconius_erato_box = document.createElement('input');
+    const Heliconius_ethilla_box = document.createElement('input');
+    const Heliconius_nattereri_box = document.createElement('input');
+    const Heliconius_numato_box = document.createElement('input');
+    const Heliconius_sara_box = document.createElement('input');
+    const Oleria_aquata_box = document.createElement('input');
+    const Paracalystos_sp_box = document.createElement('input');
+    const Saliana_triangularis_box = document.createElement('input');
+    const Strymon_oreala_box = document.createElement('input');
+    const Bombus_morio_box = document.createElement('input');
+    const Epicharis_obscura_box = document.createElement('input');
+    const Euglossa_chalybeata_box = document.createElement('input');
+    const Euglossa_sp_box = document.createElement('input');
+    const Trigona_fulviventris_box = document.createElement('input');
     var switchElement = document.createElement('input');
 
     const updateBipartiteGraph = (resetZoom = true, inputnodes, inputlinks) => {
@@ -209,37 +228,76 @@ useEffect(() => {
 
       const selectedNodeIds = new Set();
 
-      selectedNodeIds.add(1).add(2).add(3).add(4).add(5);
+      selectedNodeIds.add(1).add(2).add(3).add(4).add(5).add(6).add(7).add(8).add(9).add(10).add(11).add(12).add(13).add(14).add(15).add(16).add(17).add(18).add(19).add(20).add(21).add(22);
 
-      if (newCheckbox.checked) {
-        selectedNodeIds.add(6);
+      if (Amazilia_fimbriata_box.checked) {
+        selectedNodeIds.add(23);
       }
-      if (newCheckbox2.checked) {
-        selectedNodeIds.add(7);
+      if (Aphantochroa_cirrhochloris_box.checked) {
+        selectedNodeIds.add(24);
       }
-      if (newCheckbox3.checked) {
-        selectedNodeIds.add(8);
+      if (Clytolaema_rubricauda_box.checked) {
+        selectedNodeIds.add(25);
       }
-      if (newCheckbox4.checked) {
-        selectedNodeIds.add(9);
+      if (Glaucis_hirsuta_box.checked) {
+        selectedNodeIds.add(26);
       }
-      if (newCheckbox5.checked) {
-        selectedNodeIds.add(10);
+      if (Leucochloris_albicollis_box.checked) {
+        selectedNodeIds.add(27);
       }
-      if (newCheckbox6.checked) {
-        selectedNodeIds.add(11);
+      if (Phaethornis_eurynome_box.checked) {
+        selectedNodeIds.add(28);
       }
-      if (newCheckbox7.checked) {
-        selectedNodeIds.add(12);
+      if (Phaethornis_squalidus_box.checked) {
+        selectedNodeIds.add(29);
       }
-      if (newCheckbox8.checked) {
-        selectedNodeIds.add(13);
+      if (Rhamphodon_naevius_box.checked) {
+        selectedNodeIds.add(30);
       }
-      if (newCheckbox9.checked) {
-        selectedNodeIds.add(14);
+      if (Thalurania_xglaucopis_box.checked) {
+        selectedNodeIds.add(31);
       }
-      if (newCheckbox10.checked) {
-        selectedNodeIds.add(15);
+      if (Heliconius_erato_box.checked) {
+        selectedNodeIds.add(32);
+      }
+      if (Heliconius_ethilla_box.checked) {
+        selectedNodeIds.add(33);
+      }
+      if (Heliconius_nattereri_box.checked) {
+        selectedNodeIds.add(34);
+      }
+      if (Heliconius_numato_box.checked) {
+        selectedNodeIds.add(35);
+      }
+      if (Heliconius_sara_box.checked) {
+        selectedNodeIds.add(36);
+      }
+      if (Oleria_aquata_box.checked) {
+        selectedNodeIds.add(37);
+      }
+      if (Paracalystos_sp_box.checked) {
+        selectedNodeIds.add(38);
+      }
+      if (Saliana_triangularis_box.checked) {
+        selectedNodeIds.add(39);
+      }
+      if (Strymon_oreala_box.checked) {
+        selectedNodeIds.add(40);
+      }
+      if (Bombus_morio_box.checked) {
+        selectedNodeIds.add(41);
+      }
+      if (Epicharis_obscura_box.checked) {
+        selectedNodeIds.add(42);
+      }
+      if (Euglossa_chalybeata_box.checked) {
+        selectedNodeIds.add(43);
+      }
+      if (Euglossa_sp_box.checked) {
+        selectedNodeIds.add(44);
+      }
+      if (Trigona_fulviventris_box.checked) {
+        selectedNodeIds.add(45);
       }
 
       // Filter nodes and links based on selected nodes
@@ -477,6 +535,7 @@ useEffect(() => {
 
         const buttonTextSpr = document.createElement('span');
         buttonTextSpr.innerText = 'Values for spread*';
+        buttonTextSpr.classList.add('sectionText');
         SpreadWrapper.appendChild(buttonTextSpr);
 
         const handleRandomChanceChange = (event) => {
@@ -544,6 +603,7 @@ useEffect(() => {
 
         const SwitchText = document.createElement('span');
         SwitchText.innerText = 'Switch between bipartite and projection view';
+        SwitchText.classList.add('sectionText');
         SpreadWrapper.appendChild(SwitchText);
 
         var switchContainer = document.createElement("label");
@@ -560,65 +620,166 @@ useEffect(() => {
         ResilienceWrapper.classList.add('checkbox-wrapper');
         CheckboxWrapperRef.current.prepend(ResilienceWrapper);
 
-        newCheckbox.type = 'checkbox'
-        newCheckbox.checked = true;
-        newCheckbox.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox);
+        Amazilia_fimbriata_box.type = 'checkbox'
+        Amazilia_fimbriata_box.checked = true;
+        Amazilia_fimbriata_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Amazilia_fimbriata_box.classList.add('checkboxes');
+        Amazilia_fimbriata_box.title = 'Hummingbird: Amazilia fimbriata';
+        ResilienceWrapper.appendChild(Amazilia_fimbriata_box);
 
-        newCheckbox2.type = 'checkbox'
-        newCheckbox2.checked = true;
-        newCheckbox2.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox2.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox2);
+        Aphantochroa_cirrhochloris_box.type = 'checkbox'
+        Aphantochroa_cirrhochloris_box.checked = true;
+        Aphantochroa_cirrhochloris_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Aphantochroa_cirrhochloris_box.classList.add('checkboxes');
+        Aphantochroa_cirrhochloris_box.title = 'Hummingbird: Aphantochroa cirrhochloris';
+        ResilienceWrapper.appendChild(Aphantochroa_cirrhochloris_box);
 
-        newCheckbox3.type = 'checkbox'
-        newCheckbox3.checked = true;
-        newCheckbox3.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox3.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox3);
+        Clytolaema_rubricauda_box.type = 'checkbox'
+        Clytolaema_rubricauda_box.checked = true;
+        Clytolaema_rubricauda_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Clytolaema_rubricauda_box.classList.add('checkboxes');
+        Clytolaema_rubricauda_box.title = 'Hummingbird: Clytolaema rubricauda';
+        ResilienceWrapper.appendChild(Clytolaema_rubricauda_box);
 
-        newCheckbox4.type = 'checkbox'
-        newCheckbox4.checked = true;
-        newCheckbox4.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox4.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox4);
+        Glaucis_hirsuta_box.type = 'checkbox'
+        Glaucis_hirsuta_box.checked = true;
+        Glaucis_hirsuta_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Glaucis_hirsuta_box.classList.add('checkboxes');
+        Glaucis_hirsuta_box.title = 'Hummingbird: Glaucis hirsuta';
+        ResilienceWrapper.appendChild(Glaucis_hirsuta_box);
 
-        newCheckbox5.type = 'checkbox'
-        newCheckbox5.checked = true;
-        newCheckbox5.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox5.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox5);
+        Leucochloris_albicollis_box.type = 'checkbox'
+        Leucochloris_albicollis_box.checked = true;
+        Leucochloris_albicollis_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Leucochloris_albicollis_box.classList.add('checkboxes');
+        Leucochloris_albicollis_box.title = 'Hummingbird: Leucochloris albicollis';
+        ResilienceWrapper.appendChild(Leucochloris_albicollis_box);
 
-        newCheckbox6.type = 'checkbox'
-        newCheckbox6.checked = true;
-        newCheckbox6.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox6.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox6);
+        Phaethornis_eurynome_box.type = 'checkbox'
+        Phaethornis_eurynome_box.checked = true;
+        Phaethornis_eurynome_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Phaethornis_eurynome_box.classList.add('checkboxes');
+        Phaethornis_eurynome_box.title = 'Hummingbird: Phaethornis eurynome';
+        ResilienceWrapper.appendChild(Phaethornis_eurynome_box);
 
-        newCheckbox7.type = 'checkbox'
-        newCheckbox7.checked = true;
-        newCheckbox7.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox7.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox7);
+        Phaethornis_squalidus_box.type = 'checkbox'
+        Phaethornis_squalidus_box.checked = true;
+        Phaethornis_squalidus_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Phaethornis_squalidus_box.classList.add('checkboxes');
+        Phaethornis_squalidus_box.title = 'Hummingbird: Phaethornis squalidus';
+        ResilienceWrapper.appendChild(Phaethornis_squalidus_box);
 
-        newCheckbox8.type = 'checkbox'
-        newCheckbox8.checked = true;
-        newCheckbox8.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox8.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox8);
+        Rhamphodon_naevius_box.type = 'checkbox'
+        Rhamphodon_naevius_box.checked = true;
+        Rhamphodon_naevius_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Rhamphodon_naevius_box.classList.add('checkboxes');
+        Rhamphodon_naevius_box.title = 'Hummingbird: Rhamphodon naevius';
+        ResilienceWrapper.appendChild(Rhamphodon_naevius_box);
 
-        newCheckbox9.type = 'checkbox'
-        newCheckbox9.checked = true;
-        newCheckbox9.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox9.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox9);
+        Thalurania_xglaucopis_box.type = 'checkbox'
+        Thalurania_xglaucopis_box.checked = true;
+        Thalurania_xglaucopis_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Thalurania_xglaucopis_box.classList.add('checkboxes');
+        Thalurania_xglaucopis_box.title = 'Hummingbird: Thalurania glaucopis';
+        ResilienceWrapper.appendChild(Thalurania_xglaucopis_box);
 
-        newCheckbox10.type = 'checkbox'
-        newCheckbox10.checked = true;
-        newCheckbox10.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
-        newCheckbox10.classList.add('checkboxes');
-        ResilienceWrapper.appendChild(newCheckbox10);
+        Heliconius_erato_box.type = 'checkbox'
+        Heliconius_erato_box.checked = true;
+        Heliconius_erato_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Heliconius_erato_box.classList.add('checkboxes');
+        Heliconius_erato_box.title = 'Butterfly: Heliconius erato';
+        ResilienceWrapper.appendChild(Heliconius_erato_box);
+
+        Heliconius_ethilla_box.type = 'checkbox'
+        Heliconius_ethilla_box.checked = true;
+        Heliconius_ethilla_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Heliconius_ethilla_box.classList.add('checkboxes');
+        Heliconius_ethilla_box.title = 'Butterfly: Heliconius ethilla';
+        ResilienceWrapper.appendChild(Heliconius_ethilla_box);
+
+        Heliconius_nattereri_box.type = 'checkbox'
+        Heliconius_nattereri_box.checked = true;
+        Heliconius_nattereri_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Heliconius_nattereri_box.classList.add('checkboxes');
+        Heliconius_nattereri_box.title = 'Butterfly: Heliconius nattereri';
+        ResilienceWrapper.appendChild(Heliconius_nattereri_box);
+
+        Heliconius_numato_box.type = 'checkbox'
+        Heliconius_numato_box.checked = true;
+        Heliconius_numato_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Heliconius_numato_box.classList.add('checkboxes');
+        Heliconius_numato_box.title = 'Butterfly: Heliconius numato';
+        ResilienceWrapper.appendChild(Heliconius_numato_box);
+
+        Heliconius_sara_box.type = 'checkbox'
+        Heliconius_sara_box.checked = true;
+        Heliconius_sara_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Heliconius_sara_box.classList.add('checkboxes');
+        Heliconius_sara_box.title = 'Butterfly: Heliconius sara';
+        ResilienceWrapper.appendChild(Heliconius_sara_box);
+
+        Oleria_aquata_box.type = 'checkbox'
+        Oleria_aquata_box.checked = true;
+        Oleria_aquata_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Oleria_aquata_box.classList.add('checkboxes');
+        Oleria_aquata_box.title = 'Butterfly: Oleria aquata';
+        ResilienceWrapper.appendChild(Oleria_aquata_box);
+
+        Paracalystos_sp_box.type = 'checkbox'
+        Paracalystos_sp_box.checked = true;
+        Paracalystos_sp_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Paracalystos_sp_box.classList.add('checkboxes');
+        Paracalystos_sp_box.title = 'Butterfly: Paracalystos sp.';
+        ResilienceWrapper.appendChild(Paracalystos_sp_box);
+
+        Saliana_triangularis_box.type = 'checkbox'
+        Saliana_triangularis_box.checked = true;
+        Saliana_triangularis_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Saliana_triangularis_box.classList.add('checkboxes');
+        Saliana_triangularis_box.title = 'Butterfly: Saliana triangularis';
+        ResilienceWrapper.appendChild(Saliana_triangularis_box);
+
+        Strymon_oreala_box.type = 'checkbox'
+        Strymon_oreala_box.checked = true;
+        Strymon_oreala_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Strymon_oreala_box.classList.add('checkboxes');
+        Strymon_oreala_box.title = 'Butterfly: Strymon oreala';
+        ResilienceWrapper.appendChild(Strymon_oreala_box);
+
+        Bombus_morio_box.type = 'checkbox'
+        Bombus_morio_box.checked = true;
+        Bombus_morio_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Bombus_morio_box.classList.add('checkboxes');
+        Bombus_morio_box.title = 'Bee: Bombus morio';
+        ResilienceWrapper.appendChild(Bombus_morio_box);
+
+        Epicharis_obscura_box.type = 'checkbox'
+        Epicharis_obscura_box.checked = true;
+        Epicharis_obscura_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Epicharis_obscura_box.classList.add('checkboxes');
+        Epicharis_obscura_box.title = 'Bee: Epicharis obscura';
+        ResilienceWrapper.appendChild(Epicharis_obscura_box);
+
+        Euglossa_chalybeata_box.type = 'checkbox'
+        Euglossa_chalybeata_box.checked = true;
+        Euglossa_chalybeata_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Euglossa_chalybeata_box.classList.add('checkboxes');
+        Euglossa_chalybeata_box.title = 'Bee: Euglossa chalybeata';
+        ResilienceWrapper.appendChild(Euglossa_chalybeata_box);
+
+        Euglossa_sp_box.type = 'checkbox'
+        Euglossa_sp_box.checked = true;
+        Euglossa_sp_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Euglossa_sp_box.classList.add('checkboxes');
+        Euglossa_sp_box.title = 'Bee: Euglossa sp.';
+        ResilienceWrapper.appendChild(Euglossa_sp_box);
+
+        Trigona_fulviventris_box.type = 'checkbox'
+        Trigona_fulviventris_box.checked = true;
+        Trigona_fulviventris_box.addEventListener('change', () => updateBipartiteGraph(false, data.nodesBi, data.linksBi));
+        Trigona_fulviventris_box.classList.add('checkboxes');
+        Trigona_fulviventris_box.title = 'Bee: Trigona fulviventris';
+        ResilienceWrapper.appendChild(Trigona_fulviventris_box);
       };
 
     // Create a zoom behavior
@@ -652,10 +813,8 @@ useEffect(() => {
         d3
           .forceLink(links)
           .id((d) => d.id)
-          .strength((d) => 1 / ((Math.min(d.source.connections, d.target.connections))+1))
-          .distance((d) => 50 * Math.exp(-0.1 * Math.max(d.source.connections, d.target.connections, 1)))
       )
-      .force('charge', d3.forceManyBody().strength(-500))
+      .force('charge', d3.forceManyBody().strength(-1000))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('x', d3.forceX(width / 2).strength(0.1))
       .force('y', d3.forceY(height / 2).strength(0.1))
@@ -669,7 +828,7 @@ useEffect(() => {
       .enter()
       .append('line')
       .attr('stroke', '#999')
-      .attr('stroke-width', d => 1.5 + d.connections || 1)
+      .attr('stroke-width', d => 0.4 + (d.connections/8)**2 || 0.5)
       .attr('stroke-opactiy', 0.6)
       .on('click', (event, d) => {
         const sourceNode = d.source;
@@ -693,7 +852,7 @@ useEffect(() => {
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
       .append('circle')
-      .attr('r', d => (6 + 1.75*d.connections))
+      .attr('r', d => (18 + (3 * Math.sqrt(d.connections/5))-(70/(d.connections+4))))
       .attr('fill', 'red')
       .attr('fill', (d) => d.color || 'red')
       .on('click', (event, d) => {
