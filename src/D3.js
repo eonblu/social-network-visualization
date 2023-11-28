@@ -8,10 +8,11 @@ const NetworkVisualization = () => {
   const wrapperRef = useRef();
   const RightWrapperRef = useRef();
   const CheckboxWrapperRef = useRef();
-  const width = window.innerWidth * 0.8;
+  const width = window.innerWidth * 0.6;
   const height = window.innerHeight * 0.8;
   var [nodeAmountBA, setnodeAmountBA] = useState(50); // Amount of Nodes BA
-  var [initialmBA, setinitialmBA] = useState (3); // Connections for each new node BA 
+  var [initialmBA, setinitialmBA] = useState (3); // Initial fully connected set of nodes for BA model
+  var [stepBA, setstepBA] = useState (3); // Connections for each new node BA 
   var [nodeAmountRandom, setnodeAmountRandom] = useState(50); // Amount of Nodes Random Graph
   var [randomChance, setRandomGraphChance] = useState(0.05); // Random Chance Random Graph
   var [infectionRate, setRandomChance] = useState(0.7); // Infectionrate
@@ -38,7 +39,7 @@ const NetworkVisualization = () => {
     return { nodes, links };
   }
 
-  function generateBarabasiAlbertGraph(nodesCount, m) {
+  function generateBarabasiAlbertGraph(nodesCount, m, n) {
 
     const nodes = Array.from({ length: nodesCount }, (_, i) => ({ id: i + 1, connections: 0 }));
 
@@ -54,7 +55,7 @@ const NetworkVisualization = () => {
     for (let i = m + 1; i <= nodesCount; i++) {
       const probabilities = nodes.map(node => node.connections / (2 * links.length));
   
-      for (let j = 0; j < m; j++) {
+      for (let j = 0; j < n; j++) {
         const targetIndex = selectNode(probabilities);
         links.push({ source: i, target: nodes[targetIndex].id });
         nodes[i - 1].connections++;
@@ -115,7 +116,7 @@ const NetworkVisualization = () => {
   function infect(infRate, mRate) {
     const chancevalue = Math.random();
     if (chancevalue < (mRate * mRate)) {return (Math.random() < (0.02 * infRate))}
-    else if (chancevalue < mRate) {return (Math.random() < (0.15 * infRate))}
+    else if (chancevalue < mRate) {return (Math.random() < (0.25 * infRate))}
     else {return (Math.random() < infRate)}
   }
   
@@ -187,7 +188,7 @@ useEffect(() => {
   }
 
     // Your graph data
-    var BAGraph = generateBarabasiAlbertGraph(50, 3);
+    var BAGraph = generateBarabasiAlbertGraph(50, 3, 3);
     var nodes = BAGraph.nodes;
     var links = BAGraph.links;
 
@@ -350,7 +351,7 @@ useEffect(() => {
           newGraph = getGraphData(data.nodes3, data.links3, true);
           break;
         case 4:
-          newGraph = generateBarabasiAlbertGraph(nodeAmountBA, initialmBA);
+          newGraph = generateBarabasiAlbertGraph(nodeAmountBA, initialmBA, stepBA);
           break;
         case 5:
           nodes = d3.range(1, nodeAmountRandom + 1).map((i) => ({ id: i, connections: 0 }));
@@ -416,7 +417,7 @@ useEffect(() => {
         buttonWrapper.appendChild(resetButton3);
 
         const buttonTextAlgs = document.createElement('span');
-        buttonTextAlgs.innerText = 'Algorithmic Graph Creation';
+        buttonTextAlgs.innerText = 'Algorithmic Network Creation';
         buttonTextAlgs.classList.add('sectionTitle');
         buttonWrapper.appendChild(buttonTextAlgs);
 
@@ -431,7 +432,7 @@ useEffect(() => {
           setnodeAmountBA(newRandomChance2);
           // eslint-disable-next-line
           nodeAmountBA = newRandomChance2;
-          sliderBA1Text.innerHTML = '# of nodes ' + nodeAmountBA;
+          sliderBA1Text.innerHTML = 'Amount of nodes ' + nodeAmountBA;
         };
 
         const sliderBA1 = document.createElement('input');
@@ -445,7 +446,7 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderBA1);
 
         var sliderBA1Text = document.createElement('sliderText');
-        sliderBA1Text.innerHTML = '# of nodes ' + nodeAmountBA;
+        sliderBA1Text.innerHTML = 'Amount of nodes ' + nodeAmountBA;
         sliderBA1Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderBA1Text);
 
@@ -454,7 +455,7 @@ useEffect(() => {
           setinitialmBA(newRandomChance2);
           // eslint-disable-next-line
           initialmBA = newRandomChance2;
-          sliderBA2Text.innerHTML = 'Initial Connections ' + initialmBA;
+          sliderBA2Text.innerHTML = 'Initial Networksize ' + initialmBA;
         };
 
         const sliderBA2 = document.createElement('input');
@@ -468,9 +469,32 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderBA2);
 
         var sliderBA2Text = document.createElement('sliderText');
-        sliderBA2Text.innerHTML = 'Initial Connections ' + initialmBA;
+        sliderBA2Text.innerHTML = 'Initial Networksize ' + initialmBA;
         sliderBA2Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderBA2Text);
+
+        const handlestepBAChange = (event) => {
+          const newRandomChance2 = parseFloat(event.target.value);
+          setstepBA(newRandomChance2);
+          // eslint-disable-next-line
+          stepBA = newRandomChance2;
+          sliderBA3Text.innerHTML = 'Connections added for a new node ' + stepBA;
+        };
+
+        const sliderBA3 = document.createElement('input');
+        sliderBA3.type = 'range';
+        sliderBA3.min = 1;
+        sliderBA3.max = 10;
+        sliderBA3.step = 1;
+        sliderBA3.value = stepBA;
+        sliderBA3.classList.add('slider');
+        sliderBA3.addEventListener('input', handlestepBAChange);
+        buttonWrapper.appendChild(sliderBA3);
+
+        var sliderBA3Text = document.createElement('sliderText');
+        sliderBA3Text.innerHTML = 'Connections added for a new node ' + stepBA;
+        sliderBA3Text.classList.add('sliderText');
+        buttonWrapper.appendChild(sliderBA3Text);
 
         const resetButton5 = document.createElement('button');
         resetButton5.innerText = 'Random';
@@ -483,7 +507,7 @@ useEffect(() => {
           setnodeAmountRandom(newRandomChance2);
           // eslint-disable-next-line
           nodeAmountRandom = newRandomChance2;
-          sliderR1Text.innerHTML = '# of nodes ' + nodeAmountRandom;
+          sliderR1Text.innerHTML = 'Amount of nodes ' + nodeAmountRandom;
         };
 
         const sliderR1 = document.createElement('input');
@@ -497,7 +521,7 @@ useEffect(() => {
         buttonWrapper.appendChild(sliderR1);
 
         var sliderR1Text = document.createElement('sliderText');
-        sliderR1Text.innerHTML = '# of nodes ' + nodeAmountRandom;
+        sliderR1Text.innerHTML = 'Amount of nodes ' + nodeAmountRandom;
         sliderR1Text.classList.add('sliderText');
         buttonWrapper.appendChild(sliderR1Text);
 
@@ -529,12 +553,12 @@ useEffect(() => {
         RightWrapperRef.current.prepend(SpreadWrapper);
 
         const buttonTextSpread = document.createElement('span');
-        buttonTextSpread.innerText = 'Spread';
+        buttonTextSpread.innerText = 'Simple Spread Simulation';
         buttonTextSpread.classList.add('sectionTitle');
         SpreadWrapper.appendChild(buttonTextSpread);
 
         const buttonTextSpr = document.createElement('span');
-        buttonTextSpr.innerText = 'Values for spread*';
+        buttonTextSpr.innerText = 'Values for spread';
         buttonTextSpr.classList.add('sectionText');
         SpreadWrapper.appendChild(buttonTextSpr);
 
@@ -585,18 +609,18 @@ useEffect(() => {
         SpreadWrapper.appendChild(sliderText2);
 
         const buttonTextResi = document.createElement('span');
-        buttonTextResi.innerText = 'Resilience';
+        buttonTextResi.innerText = 'Simple Resilience Simulation';
         buttonTextResi.classList.add('sectionTitle');
         SpreadWrapper.appendChild(buttonTextResi);
 
         const resetButton6 = document.createElement('button');
-        resetButton6.innerText = 'Bipartite Graph';
+        resetButton6.innerText = 'Full Bipartite Graph';
         resetButton6.addEventListener('click', () => resetGraph(6, true));
         resetButton6.classList.add('button');
         SpreadWrapper.appendChild(resetButton6);
 
         const resetButton7 = document.createElement('button');
-        resetButton7.innerText = 'Projection Graph';
+        resetButton7.innerText = 'Full Projection Graph';
         resetButton7.addEventListener('click', () => resetGraph(7, true));
         resetButton7.classList.add('button');
         SpreadWrapper.appendChild(resetButton7);

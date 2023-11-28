@@ -1,8 +1,48 @@
+.App {
+  display: flex;
+  justify-content: center;
+}
+
 .ExplanationText {
   display: flex;
   margin: 1vw;
   flex-direction: column;
   text-align: left;
+  font-size: 87%;
+}
+
+.ExplanationSectionTitle {
+  font-weight: bold;
+  font-size: 115%;
+  margin: 0.15vw 0vw 0.15vw 0vw;
+}
+
+.ExplanationSectionText{
+  margin: 0.15vw 0vw 0.15vw 0vw;
+  font-size: 95%;
+}
+
+.container {
+  position: relative;
+  color:#2196F3;
+}
+
+.picture {
+  transform: scale(0.60);
+  position: absolute;
+  bottom: -400px;
+  right: -400px;
+  display: none;
+}
+
+.container:hover .picture {
+  display: inline-block;
+}
+
+.image {
+  width: 50px;
+  height: auto;
+  border: 1px solid #ccc;
 }
 
 .sectionTitle {
