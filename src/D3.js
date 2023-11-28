@@ -15,8 +15,8 @@ const NetworkVisualization = () => {
   var [stepBA, setstepBA] = useState (3); // Connections for each new node BA 
   var [nodeAmountRandom, setnodeAmountRandom] = useState(50); // Amount of Nodes Random Graph
   var [randomChance, setRandomGraphChance] = useState(0.05); // Random Chance Random Graph
-  var [infectionRate, setRandomChance] = useState(0.7); // Infectionrate
-  var [maskRate, setRandomChance2] = useState(0.7); // Maskrate
+  var [infectionRate, setRandomChance] = useState(0.65); // Infectionrate
+  var [maskRate, setRandomChance2] = useState(0.2); // Maskrate
   var generationvalue = 0;
   let generationtext;
 
